@@ -1,0 +1,6 @@
+[Desktop Entry]
+Name=Wine
+Type=Application
+Categories=Network;
+Icon=Wine
+Exec=wine %f
