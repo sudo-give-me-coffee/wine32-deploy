@@ -12,4 +12,4 @@ after_success:
   - mkdir out
   - docker run --rm -v $(pwd)/out:/tmp/out -ti wine.appimage cp Wine-x86_64.AppImage /tmp/Wine-x86_64.AppImage
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - bash upload.sh $(find /var/lib/docker -name 'Wine-*x86_64.AppImage')
+  - bash upload.sh $(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage')
