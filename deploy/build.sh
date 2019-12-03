@@ -64,5 +64,5 @@ mv "Wine-x86_64.AppImage" "Wine-${Version}-x86_64.AppImage"
 
 # upload AppImage
 
-./upload.sh "Wine-${Version}-x86_64.AppImage"
+curl --upload-file ./"Wine-${Version}-x86_64.AppImage" https://transfer.sh/"Wine-${Version}-x86_64.AppImage"  
 exit
