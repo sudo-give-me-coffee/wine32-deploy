@@ -10,6 +10,6 @@ script:
 
 after_success:
   - mkdir out
-  - docker run --rm -v $(pwd)/out:/tmp/out -ti wine.appimage cp Wine-x86_64.AppImage /tmp/out/Wine-x86_64.AppImage
+  - docker run --rm -v $(pwd)/out:/tmp/out -ti wine.appimage cp Wine-x86_64.AppImage /tmp/Wine-x86_64.AppImage
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - bash upload.sh out/*
