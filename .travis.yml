@@ -7,10 +7,11 @@ services:
 script:
   - chmod +x deploy/build.sh
   - docker build . -t wine.appimage
-  - cp "$(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage')" .
+  - sudo cp "$(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage')" .
+  - chmod 777 Wine-*x86_64.AppImage
 
 after_success:
   - mkdir out
   - docker run --rm -v $(pwd)/out:/tmp/out -ti wine.appimage cp Wine-x86_64.AppImage /tmp/Wine-x86_64.AppImage
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - bash upload.sh $(find . -name 'Wine-*x86_64.AppImage')
+  - bash upload.sh Wine-*x86_64.AppImage
