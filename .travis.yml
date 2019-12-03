@@ -5,5 +5,5 @@ services:
   - docker
 
 script:
-  - chmod + x deploy/build.sh
+  - chmod +x deploy/build.sh
   - docker build .
