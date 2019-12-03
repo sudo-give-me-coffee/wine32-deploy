@@ -11,7 +11,6 @@ export wgetOptions="-nv -c --show-progress --progress=bar:force:noscroll"
 export DownloadURLs=(
   "https://www.playonlinux.com/wine/binaries/phoenicis/upstream-linux-x86/PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz"
   "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
-  "https://github.com/probonopd/uploadtool/raw/master/upload.sh"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/libhookexecv.so"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/wine-preloader_hook"
   )
@@ -36,7 +35,6 @@ wget ${wgetOptions} ${DownloadURLs[@]}
 chmod +x "appimagetool-x86_64.AppImage"
 chmod +x "data/AppRun"
 chmod +x "wine-preloader_hook"
-chmod +x "upload.sh"
 
 # Get WINE deps
 
@@ -62,7 +60,4 @@ mv "wine-preloader_hook" "${WorkingDir}/bin"
 ./squashfs-root/AppRun "${WorkingDir}"
 mv "Wine-x86_64.AppImage" "Wine-${Version}-x86_64.AppImage"
 
-# upload AppImage
-
-curl --upload-file ./"Wine-${Version}-x86_64.AppImage" https://transfer.sh/"Wine-${Version}-x86_64.AppImage"  
 exit
