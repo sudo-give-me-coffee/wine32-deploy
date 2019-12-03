@@ -13,6 +13,8 @@ export DownloadURLs=(
   "https://www.playonlinux.com/wine/binaries/phoenicis/upstream-linux-x86/PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz"
   "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
   "https://github.com/probonopd/uploadtool/raw/master/upload.sh"
+  "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/libhookexecv.so"
+  "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/wine-preloader_hook"
   )
 
 # Install build deps
@@ -35,6 +37,7 @@ wget ${wgetOptions} ${DownloadURLs[@]}
 
 chmod +x "appimagetool-x86_64.AppImage"
 chmod +x "data/AppRun"
+chmod +x "wine-preloader_hook"
 
 # Get WINE deps
 
@@ -51,6 +54,8 @@ find "${PackagesDirectory}" -name '*deb' ! -name 'libwine*' -exec dpkg -x {} "./
 # Copy data to AppDir
 
 cp data/* "${WorkingDir}"
+mv "libhookexecv.so" "${WorkingDir}/bin"
+mv "wine-preloader_hooks" "${WorkingDir}/bin"
 
 # Build AppImage
 ./appimagetool-x86_64.AppImage --appimage-extract
