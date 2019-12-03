@@ -9,7 +9,7 @@ script:
   - docker build . -t wine.appimage
 
 after_success:
-  - mkdir /tmp/out
+  - mkdir out
   - docker run --rm -v $(pwd)/out:/tmp/out -ti wine.appimage cp Wine-x86_64.AppImage /tmp/out/Wine-x86_64.AppImage
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
-  - bash upload.sh /tmp/out/*
+  - bash upload.sh out/*
