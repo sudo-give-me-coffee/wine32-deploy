@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
 
-
 # Setup environment
 
 export ARCH="x86_64"
@@ -32,12 +31,12 @@ mkdir -p "${PackagesDirectory}"
 
 wget ${wgetOptions} ${DownloadURLs[@]}
 
-
 # Turn executable
 
 chmod +x "appimagetool-x86_64.AppImage"
 chmod +x "data/AppRun"
 chmod +x "wine-preloader_hook"
+chmod +x "upload.sh"
 
 # Get WINE deps
 
@@ -55,9 +54,10 @@ find "${PackagesDirectory}" -name '*deb' ! -name 'libwine*' -exec dpkg -x {} "./
 
 cp data/* "${WorkingDir}"
 mv "libhookexecv.so" "${WorkingDir}/bin"
-mv "wine-preloader_hooks" "${WorkingDir}/bin"
+mv "wine-preloader_hook" "${WorkingDir}/bin"
 
 # Build AppImage
+
 ./appimagetool-x86_64.AppImage --appimage-extract
 ./squashfs-root/AppRun "${WorkingDir}"
 mv "Wine-x86_64.AppImage" "Wine-${Version}-x86_64.AppImage"
@@ -65,5 +65,4 @@ mv "Wine-x86_64.AppImage" "Wine-${Version}-x86_64.AppImage"
 # upload AppImage
 
 ./upload.sh "Wine-${Version}-x86_64.AppImage"
-
 exit
