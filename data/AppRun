@@ -27,7 +27,7 @@ if [ "$1" == "winetricks" ]; then
   shift
   "${HERE}/bin/winetricks" ${@}
   exit $?
-if
+fi
 
 #Wine
 LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${@}" 2>&1 | grep -v ":fixme:"
