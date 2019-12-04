@@ -4,7 +4,7 @@
 
 export ARCH="x86_64"
 export Version="4.0.3"
-export BuildDependencies="aptitude wget file gzip curl"
+export BuildDependencies="aptitude wget file gzip curl cabextract"
 export WorkingDir="Wine.AppDir"
 export PackagesDirectory='/tmp/.cache'
 export wgetOptions="-nv -c --show-progress --progress=bar:force:noscroll"
@@ -13,6 +13,7 @@ export DownloadURLs=(
   "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/libhookexecv.so"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/wine-preloader_hook"
+  "https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks"
   )
 
 # Install build deps
@@ -35,6 +36,7 @@ wget ${wgetOptions} ${DownloadURLs[@]}
 chmod +x "appimagetool-x86_64.AppImage"
 chmod +x "data/AppRun"
 chmod +x "wine-preloader_hook"
+chmod +x "winetricks"
 
 # Get WINE deps
 
@@ -53,6 +55,8 @@ find "${PackagesDirectory}" -name '*deb' ! -name 'libwine*' -exec dpkg -x {} "./
 cp data/* "${WorkingDir}"
 mv "libhookexecv.so" "${WorkingDir}/bin"
 mv "wine-preloader_hook" "${WorkingDir}/bin"
+mv "winetricks" "${WorkingDir}/bin"
+cp "$(which cabextract)" "${WorkingDir}/bin"
 
 # Build AppImage
 
