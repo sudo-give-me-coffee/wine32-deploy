@@ -20,7 +20,8 @@ export WINELDLIBRARY="${HERE}/lib/ld-linux.so.2"
 export WINE="${HERE}/AppRun"
 export WINESERVER="$(which echo)"
 
-if [ "$1" == "" ] then
+if [ "$1" == "winetricks" ]; then
+  shift
   "${HERE}/bin/winetricks" ${@}
   exit $?
 if
