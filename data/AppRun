@@ -29,5 +29,8 @@ if [ "$1" == "winetricks" ]; then
   exit $?
 fi
 
+#Copy ld-linux.so.2 to host
+cp -L "${HERE}/lib/ld-linux.so.2" /tmp
+
 #Wine
-LD_PRELOAD="$HERE/bin/libhookexecv.so" "$WINELDLIBRARY" "$HERE/bin/wine64" "$@" 2>&1 | cat | grep -v ":fixme:"
+"$HERE/bin/wine64" "$@" 2>&1 | cat | grep -v ":fixme:"
