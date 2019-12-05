@@ -30,4 +30,4 @@ if [ "$1" == "winetricks" ]; then
 fi
 
 #Wine
-LD_PRELOAD="$HERE/bin/libhookexecv.so" "$WINELDLIBRARY" "$HERE/bin/wine" "$@" 2>&1 | cat | grep -v ":fixme:"
+LD_PRELOAD="$HERE/bin/libhookexecv.so" "$WINELDLIBRARY" "$HERE/bin/wine64" "$@" 2>&1 | cat | grep -v ":fixme:"
