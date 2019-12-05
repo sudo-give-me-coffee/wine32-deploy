@@ -3,13 +3,13 @@
 # Setup environment
 
 export ARCH="x86_64"
-export Version="4.0.3"
-export BuildDependencies="aptitude wget file gzip curl cabextract"
+export Version="4.21"
+export BuildDependencies="aptitude wget file gzip curl cabextract patchelf"
 export WorkingDir="Wine.AppDir"
 export PackagesDirectory='/tmp/.cache'
 export wgetOptions="-nv -c --show-progress --progress=bar:force:noscroll"
 export DownloadURLs=(
-  "https://www.playonlinux.com/wine/binaries/phoenicis/upstream-linux-x86/PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz"
+  "https://www.playonlinux.com/wine/binaries/phoenicis/upstream-linux-amd64/PlayOnLinux-wine-${Version}-upstream-linux-amd64.tar.gz"
   "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/libhookexecv.so"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/wine-preloader_hook"
@@ -44,11 +44,16 @@ aptitude -y -d -o dir::cache::archives="${PackagesDirectory}" install libwine:i3
 
 # Extract WINE
 
-tar -xzf "PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz" -C "${WorkingDir}"
+tar -xzf "PlayOnLinux-wine-${Version}-upstream-linux-amd64.tar.gz" -C "${WorkingDir}"
 
 # Copy wine dependencies to AppDir
 
 find "${PackagesDirectory}" -name '*deb' ! -name 'libwine*' -exec dpkg -x {} "./${WorkingDir}" \;
+
+# Patch wine
+
+patchelf --set-interpreter /tmp/ld-linux.so.2 "${WorkingDir}/bin/wine"
+patchelf --set-interpreter /tmp/ld-linux.so.2 "${WorkingDir}/bin/wine-preloader"
 
 # Copy data to AppDir
 
