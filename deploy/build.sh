@@ -13,7 +13,6 @@ export DownloadURLs=(
   "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/libhookexecv.so"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/wine-preloader_hook"
-  "https://github.com/sudo-give-me-coffee/wine-appimage/releases/download/tools/patchelf"
   "https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks"
   )
 
@@ -51,11 +50,6 @@ tar -xzf "PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz" -C "${WorkingDi
 # Copy wine dependencies to AppDir
 
 find "${PackagesDirectory}" -name '*deb' ! -name 'libwine*' -exec dpkg -x {} "./${WorkingDir}" \;
-
-# Patch wine
-
-./patchelf --set-interpreter /tmp/ld-linux.so.2 "${WorkingDir}/bin/wine"
-./patchelf --set-interpreter /tmp/ld-linux.so.2 "${WorkingDir}/bin/wine-preloader"
 
 # Copy data to AppDir
 
