@@ -33,4 +33,4 @@ fi
 cp -L "${HERE}/lib/ld-linux.so.2" /tmp
 
 #Wine
-"$HERE/bin/wine64" "$@" 2>&1 | cat | grep -v ":fixme:"
+"$HERE/bin/wine" "$@" 2>&1 | cat | grep -v ":fixme:"
