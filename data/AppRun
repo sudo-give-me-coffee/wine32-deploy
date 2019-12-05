@@ -6,6 +6,9 @@ export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu":${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH="${HERE}/lib":${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH="${HERE}/lib/i386-linux-gnu":${LD_LIBRARY_PATH}
 
+# Fix libgl error failed to load driver swrast
+export LIBGL_DRIVERS_PATH="${HERE}/usr/lib/i386-linux-gnu/dri"
+
 #Sound Library
 export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/pulseaudio":${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/alsa-lib":${LD_LIBRARY_PATH}
@@ -21,7 +24,7 @@ export WINE="${HERE}/AppRun"
 export WINESERVER="$(which echo)"
 
 #Cabextract
-export PATH="${HERE}/bin:$PATH"
+#export PATH="${HERE}/bin:$PATH"
 
 if [ "$1" == "winetricks" ]; then
   shift
@@ -29,8 +32,5 @@ if [ "$1" == "winetricks" ]; then
   exit $?
 fi
 
-#Copy ld-linux.so.2 to host
-cp -L "${HERE}/lib/ld-linux.so.2" /tmp
-
 #Wine
-"$HERE/bin/wine" "$@" 2>&1 | cat | grep -v ":fixme:"
+LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" $@ 2>&1 | grep -v ":fixme:"
