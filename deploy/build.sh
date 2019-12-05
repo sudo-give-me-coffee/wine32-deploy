@@ -4,7 +4,7 @@
 
 export ARCH="x86_64"
 export Version="4.21"
-export BuildDependencies="aptitude wget file gzip curl cabextract patchelf"
+export BuildDependencies="aptitude wget file gzip curl cabextract"
 export WorkingDir="Wine.AppDir"
 export PackagesDirectory='/tmp/.cache'
 export wgetOptions="-nv -c --show-progress --progress=bar:force:noscroll"
@@ -13,6 +13,7 @@ export DownloadURLs=(
   "https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/libhookexecv.so"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/wine-preloader_hook"
+  "https://github.com/sudo-give-me-coffee/wine-appimage/releases/download/tools/patchelf"
   "https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks"
   )
 
@@ -37,6 +38,7 @@ chmod +x "appimagetool-x86_64.AppImage"
 chmod +x "data/AppRun"
 chmod +x "wine-preloader_hook"
 chmod +x "winetricks"
+chmod +x "patchelf"
 
 # Get WINE deps
 
@@ -52,8 +54,8 @@ find "${PackagesDirectory}" -name '*deb' ! -name 'libwine*' -exec dpkg -x {} "./
 
 # Patch wine
 
-patchelf --set-interpreter /tmp/ld-linux.so.2 "${WorkingDir}/bin/wine"
-patchelf --set-interpreter /tmp/ld-linux.so.2 "${WorkingDir}/bin/wine-preloader"
+./patchelf --set-interpreter /tmp/ld-linux.so.2 "${WorkingDir}/bin/wine"
+./patchelf --set-interpreter /tmp/ld-linux.so.2 "${WorkingDir}/bin/wine-preloader"
 
 # Copy data to AppDir
 
