@@ -5,7 +5,7 @@
 #                                                                                    #
 #   Each of these parameters remove a set of files:                                  #
 #                                                                                    #
-#     --purge-mesa-3D  ->  AppDir/usr/lib/i386-linux-gnu/dri (180 MB)                #
+#     --purge-mesa3D  ->  AppDir/usr/lib/i386-linux-gnu/dri (180 MB)                 #
 #     --purge-windows  ->  AppDir/app/windows (50 MB)                                #
 #     --purge-gecko    ->  AppDir/app/windows/system32/gecko (91 MB)                 #
 #     --purge-mono     ->  AppDir/app/windows/system32/mono (255 MB)                 #
