@@ -36,9 +36,9 @@ wget ${wgetOptions} ${DownloadURLs[@]}
 chmod +x "appimagetool-x86_64.AppImage"
 chmod +x "data/AppRun"
 chmod +x "data/strip"
+chmod +x "data/deploy"
 chmod +x "wine-preloader_hook"
 chmod +x "winetricks"
-chmod +x "patchelf"
 
 # Get WINE deps
 
