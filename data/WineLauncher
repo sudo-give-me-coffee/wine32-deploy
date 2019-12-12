@@ -1,0 +1,59 @@
+#!/bin/bash
+
+function cleanup() {
+  if [ -d "${WINEPREFIX}/drive_c" ]; then
+    find "${WINEPREFIX}/drive_c" -maxdepth 1 -type l | sed 's|^|unlink "|' | sed 's|$|"|' |  sh
+  fi
+  if [ -f "${WINEPREFIX}/.update-timestamp" ]; then
+    echo "disabled" > "${WINEPREFIX}/.update-timestamp"
+  fi
+}
+
+HERE="$(dirname "$(readlink -f "${0}")")"
+trap cleanup EXIT
+
+export LD_LIBRARY_PATH="${HERE}/usr/lib":${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu":${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH="${HERE}/lib":${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH="${HERE}/lib/i386-linux-gnu":${LD_LIBRARY_PATH}
+
+# Fix libgl error failed to load driver swrast
+export LIBGL_DRIVERS_PATH="${HERE}/usr/lib/i386-linux-gnu/dri"
+
+#Sound Library
+export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/pulseaudio":${LD_LIBRARY_PATH}
+export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/alsa-lib":${LD_LIBRARY_PATH}
+
+#Font Config
+export FONTCONFIG_PATH="${HERE}/etc/fonts"
+
+#LD
+export WINELDLIBRARY="${HERE}/lib/ld-linux.so.2"
+
+#App command line
+LAUNCHER=$(ls "${HERE}/"*".desktop")
+APP_ID=$(grep   ^Name= "${LAUNCHER}" | cut -c 6- | sed 's/ /_/g')
+APP_EXEC=$(grep ^X-WineExec= "${LAUNCHER}" | cut -c 12-)
+
+#Where configs are stored
+export WINEPREFIX="${XDG_CONFIG_HOME}/${APP_ID}"
+
+#Cleanup directory before starting
+cleanup
+
+#Create symlinks
+APP_FILES=$(find "${HERE}/app" -maxdepth 1 | sed '1d')
+mkdir -p "${WINEPREFIX}/drive_c"
+echo "${APP_FILES}" | sed "s|^|ln -s \"|" | sed "s|$|\" ${WINEPREFIX}/drive_c|" | sh
+
+#Wine
+LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${APP_EXEC}" 2>&1 | grep -v ":fixme:"
+
+
+
+
+
+
+
+
+

@@ -23,12 +23,16 @@ export WINELDLIBRARY="${HERE}/lib/ld-linux.so.2"
 export WINE="${HERE}/AppRun"
 export WINESERVER="$(which echo)"
 
-#Cabextract
-#export PATH="${HERE}/bin:$PATH"
-
 if [ "$1" == "winetricks" ]; then
   shift
+  export PATH="$PATH:${HERE}/bin"
   "${HERE}/bin/winetricks" ${@}
+  exit $?
+fi
+
+if [ "$1" == "deploy" ]; then
+  shift
+  "${HERE}/deploy" ${@}
   exit $?
 fi
 
