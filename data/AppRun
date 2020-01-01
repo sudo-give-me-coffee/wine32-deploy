@@ -30,6 +30,12 @@ if [ "$1" == "winetricks" ]; then
   exit $?
 fi
 
+if [ "$1" == "regedit" ]; then
+  shift
+  LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${@}"
+  exit $?
+fi
+
 if [ "$1" == "deploy" ]; then
   shift
   "${HERE}/deploy" ${@}
