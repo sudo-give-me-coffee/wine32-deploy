@@ -24,7 +24,7 @@ apt install ${BuildDependencies} -y
 
 # Create Directories
 
-mkdir -p "${WorkingDir}"
+mkdir -p "${WorkingDir}/kupofl"
 mkdir -p "${PackagesDirectory}"
 
 # Download files
@@ -35,8 +35,7 @@ wget ${wgetOptions} ${DownloadURLs[@]}
 
 chmod +x "appimagetool-x86_64.AppImage"
 chmod +x "data/AppRun"
-chmod +x "data/strip"
-chmod +x "data/deploy"
+chmod +x "data/wine"
 chmod +x "wine-preloader_hook"
 chmod +x "winetricks"
 
@@ -58,6 +57,7 @@ cp data/* "${WorkingDir}"
 mv "libhookexecv.so" "${WorkingDir}/bin"
 mv "wine-preloader_hook" "${WorkingDir}/bin"
 mv "winetricks" "${WorkingDir}/bin"
+mv "${WorkingDir}/kupofl.msstyles" "${WorkingDir}/kupofl/"
 cp "$(which cabextract)" "${WorkingDir}/bin"
 
 # Build AppImage

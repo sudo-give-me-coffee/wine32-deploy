@@ -1,46 +1,125 @@
-#!/bin/bash
-HERE="$(dirname "$(readlink -f "${0}")")"
+#!/usr/bin/env bash
 
-export LD_LIBRARY_PATH="${HERE}/usr/lib":${LD_LIBRARY_PATH}
-export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu":${LD_LIBRARY_PATH}
-export LD_LIBRARY_PATH="${HERE}/lib":${LD_LIBRARY_PATH}
-export LD_LIBRARY_PATH="${HERE}/lib/i386-linux-gnu":${LD_LIBRARY_PATH}
+HERE=$(dirname "$(readlink -f "$0")")
 
-# Fix libgl error failed to load driver swrast
-export LIBGL_DRIVERS_PATH="${HERE}/usr/lib/i386-linux-gnu/dri"
+function createBottle(){
+  # Create visual style
+  echo "Copying visual style..."
 
-#Sound Library
-export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/pulseaudio":${LD_LIBRARY_PATH}
-export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/alsa-lib":${LD_LIBRARY_PATH}
+  THEME_PATH="${BOTTLE_NAME}/prefix/drive_c/windows/Resources/Themes/"
+  mkdir -p "${THEME_PATH}"
+  cp -r "${HERE}"/kupofl ./"${THEME_PATH}"
 
-#Font Config
-export FONTCONFIG_PATH="${HERE}/etc/fonts"
+  enterOnBottle
 
-#LD
-export WINELDLIBRARY="${HERE}/lib/ld-linux.so.2"
+  # Create the prefix
+  echo "Creating prefix..."
 
-#Winetricks
-export WINE="${HERE}/AppRun"
-export WINESERVER="$(which echo)"
+  export WINEPREFIX="${HOME}/prefix"
+  "${HERE}"/wine --run 2>&1 > /dev/null
+  "${HERE}"/wine regedit "${HERE}"/improve.reg 2>&1 > /dev/null
 
-if [ "$1" == "winetricks" ]; then
-  shift
-  export PATH="$PATH:${HERE}/bin"
-  "${HERE}/bin/winetricks" ${@}
-  exit $?
-fi
+  # Disable update-timestamp
+  echo "disabled" > "${BOTTLE_NAME}/prefix/.update-timestamp" 
 
-if [ "$1" == "regedit" ]; then
-  shift
-  LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${@}"
-  exit $?
-fi
+  # Backup registry
+  cp "${BOTTLE_NAME}/prefix/system.reg" "${BOTTLE_NAME}/system.reg.orig"
+  cp "${BOTTLE_NAME}/prefix/user.reg" "${BOTTLE_NAME}/user.reg.orig"
 
-if [ "$1" == "deploy" ]; then
-  shift
-  "${HERE}/deploy" ${@}
-  exit $?
-fi
+  echo "Done!"
+  exit 0
+}
 
-#Wine
-LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" $@ 2>&1 | grep -v ":fixme:"
+function installApp(){
+  checkIfIsAnBottle 
+  enterOnBottle
+
+  # Check if file exist
+  
+  if [ "$1" == "" ]; then
+    echo "Error: You must provide a file"
+    exit 1
+  elif [ ! -f "$1" ]; then
+    echo "Error: File ${@} not found!"
+    exit 1
+  fi
+
+  "${HERE}"/wine "${1}"
+  exit ${?}
+}
+
+function run(){
+  checkIfIsAnBottle 
+  enterOnBottle
+
+  # Check if file exist
+  if [ "$1" == "" ]; then
+    echo "Error: You must provide a file"
+    return 1
+  fi
+  "${HERE}"/wine "${@}"
+  exit ${?}
+}
+
+
+function runWineComponent(){
+  checkIfIsAnBottle 
+  enterOnBottle
+
+  WINE_COMPONENT=$(echo ${COMMAND} | cut -c 3-);
+
+  "${HERE}"/wine $WINE_COMPONENT ${@}
+  exit ${?}
+}
+
+
+function checkIfIsAnBottle(){
+  if [ ! -d "${BOTTLE_NAME}/prefix/" ]; then
+    echo "Error: ${BOTTLE_NAME} isn't a bottler"
+    exit 1
+  fi
+}
+
+function enterOnBottle(){
+  # Use the bottle as $HOME:
+  export WINEARCH=win32
+  export WINEPREFIX=$(readlink -m ${BOTTLE_NAME}/prefix)
+  export HOME=$(readlink -m "${BOTTLE_NAME}")
+}
+
+function printHelp(){
+  echo "  Usage:"
+  echo "   ${APPIMAGE} [command] [bottle name] [options]"
+  echo
+  echo "  Available commands are:"
+  echo
+  echo "    Wine32-AppImage commands:"
+  echo "      create-bottle  =>  Create a new bottle ith defaul settings"
+  echo "      install        =>  Install a software from outside bottle"
+  echo "      run            =>  Run a software under the bottle"
+  echo
+  echo "     Wine default command:"
+  echo "      --winetricks   =>  Open Winetricks"
+  echo "      --winecfg      =>  Open Wine configurator"
+  echo "      --regedit      =>  Open Wine register editor"
+  echo "      --taskmgr      =>  Open a task manager for wine apps"
+  echo "      --uninstaller  =>  Open the 'Wine Uninstaller'"
+  exit 1
+}
+
+COMMAND=${1}; shift
+BOTTLE_NAME=$(echo ${1} | sed "s|[[:space:]]|_|g") ; shift
+
+[ "${BOTTLE_NAME}" == "" ] && printHelp
+[ "${COMMAND}"     == "" ] && printHelp
+
+[ "${COMMAND}" == "create-bottle" ] && createBottle     ${@}
+[ "${COMMAND}" == "install" ]       && installApp       ${@}
+[ "${COMMAND}" == "run" ]           && run       ${@}
+[ "${COMMAND}" == "--winecfg" ]     && runWineComponent ${@}
+[ "${COMMAND}" == "--regedit" ]     && runWineComponent ${@}
+[ "${COMMAND}" == "--taskmgr" ]     && runWineComponent ${@}
+[ "${COMMAND}" == "--winetricks" ]  && runWineComponent ${@}
+[ "${COMMAND}" == "--uninstaller" ] && runWineComponent ${@}
+
+printHelp
