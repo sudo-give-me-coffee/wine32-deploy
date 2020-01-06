@@ -14,6 +14,7 @@ after_success:
   - mkdir out
   - docker run --rm -v $(pwd)/out:/tmp/out -ti wine.appimage cp Wine-x86_64.AppImage /tmp/Wine-x86_64.AppImage
   - wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - curl --upload-file ./Wine.AppImage "https://transfer.sh"/Wine-*x86_64.AppImage
   - bash upload.sh Wine-*x86_64.AppImage
 
 branches:
