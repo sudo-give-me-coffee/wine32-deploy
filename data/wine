@@ -33,10 +33,26 @@ export LD_PRELOAD="${HERE}/bin/libhookexecv.so"
 
 #Wine
 
+if [ "$1" == "create-register" ]; then
+  shift
+  "${WINELDLIBRARY}" "${HERE}/bin/wine" regedit "${*}"
+  exit $?
+fi
+
 if [ "$1" == "regedit" ]; then
   shift
-  echo ${*}
-  "${WINELDLIBRARY}" "${HERE}/bin/wine" regedit "${*}"
+  option="${1}"
+  if [ "${option}" == "" ]; then
+    "${WINELDLIBRARY}" "${HERE}/bin/wine" regedit > /dev/null
+    exit ${?}
+  fi
+  shift
+  "${WINELDLIBRARY}" "${HERE}/bin/wine" regedit "${option}" "${*}"
+  exit $?
+fi
+
+if [ "$1" == "--run" ]; then
+  "${WINELDLIBRARY}" "${HERE}/bin/wine" "${*}" 2>&1 | grep -v ":fixme:" > /dev/null
   exit $?
 fi
 

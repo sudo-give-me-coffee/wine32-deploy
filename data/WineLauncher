@@ -9,56 +9,34 @@ function cleanup() {
   fi
 }
 
-HERE="$(dirname "$(readlink -f "${0}")")"
-trap cleanup EXIT
-
+export HERE="$(dirname "$(readlink -f "${0}")")"
+export APP_ID=$(basename -s .desktop $(ls "${HERE}/"*".desktop"))
+export APP_PATH=$(cat "${HERE}/${APP_ID}.desktop" | grep ^"X-WineExec=" | cut -c 13- | sed 's/.$//')
+export WINEPREFIX="${XDG_CONFIG_HOME}/${APP_ID}"
+export APP_FILES=$(find "${HERE}/app" -maxdepth 1 | sed '1d')
 export LD_LIBRARY_PATH="${HERE}/usr/lib":${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu":${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH="${HERE}/lib":${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH="${HERE}/lib/i386-linux-gnu":${LD_LIBRARY_PATH}
-
-# Fix libgl error failed to load driver swrast
 export LIBGL_DRIVERS_PATH="${HERE}/usr/lib/i386-linux-gnu/dri"
-
-#Sound Library
 export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/pulseaudio":${LD_LIBRARY_PATH}
 export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/alsa-lib":${LD_LIBRARY_PATH}
-
-#Font Config
 export FONTCONFIG_PATH="${HERE}/etc/fonts"
-
-#LD
 export WINELDLIBRARY="${HERE}/lib/ld-linux.so.2"
+export LD_PRELOAD="${HERE}/bin/libhookexecv.so" 
+export TODAY="$(date '+%Y%m%d')"
+export IMPROVE_REG=$(cat "${HERE}/improve.reg" | sed "/\"InstallDate\"/c\{Insert install date here}")
 
-#App command line
-LAUNCHER=$(ls "${HERE}/"*".desktop")
-APP_ID=$(grep   ^Name= "${LAUNCHER}" | cut -c 6- | sed 's/ /_/g')
-APP_EXEC=$(grep ^X-WineExec= "${LAUNCHER}" | cut -c 12-)
-
-#Where configs are stored
-export WINEPREFIX="${XDG_CONFIG_HOME}/${APP_ID}"
-
-#Create symlinks
-APP_FILES=$(find "${HERE}/app" -maxdepth 1 | sed '1d')
 mkdir -p "${WINEPREFIX}/drive_c"
+
+trap cleanup EXIT
+     cleanup
+
 echo "${APP_FILES}" | sed "s|^|ln -s \"|" | sed "s|$|\" ${WINEPREFIX}/drive_c|" | sh
 
-#Add anti-aliasing and additional application information if needed.
 if [ ! -f "${WINEPREFIX}/system.reg" ]; then
-  LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" regedit "${HERE}/system.reg"
+  cp "${HERE}/improve.reg" "${WINEPREFIX}/drive_c/default.reg"
+  "${HERE}/wine" create-register "${WINEPREFIX}/drive_c/default.reg"
 fi
 
-#Cleanup directory before starting
-cleanup
-
-#Wine
-LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${APP_EXEC}" 2>&1 | grep -v ":fixme:"
-
-
-
-
-
-
-
-
-
+LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${APP_PATH}" ${*} 2>&1 | grep -v ":fixme:"

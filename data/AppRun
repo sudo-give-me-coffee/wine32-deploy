@@ -2,6 +2,10 @@
 
 HERE=$(dirname "$(readlink -f "$0")")
 
+VALID_CATEGORIES=(AudioVideo Audio Video Development 
+                  Education Game Graphics Network 
+                  Office Science Settings System Utility)
+
 function createBottle(){
   # Create visual style
   echo "Copying visual style..."
@@ -16,15 +20,21 @@ function createBottle(){
   echo "Creating prefix..."
 
   export WINEPREFIX="${HOME}/prefix"
-  "${HERE}"/wine --run 2>&1 > /dev/null
-  "${HERE}"/wine regedit "${HERE}"/improve.reg 2>&1 > /dev/null
+  "${HERE}"/wine --run 2> /dev/null
+  "${HERE}"/wine create-register "${HERE}"/improve.reg 2> /dev/null
 
   # Disable update-timestamp
   echo "disabled" > "${BOTTLE_NAME}/prefix/.update-timestamp" 
 
+  # Create strip data
+  echo -n > "${BOTTLE_NAME}/unneeded_packages"
+
   # Backup registry
   cp "${BOTTLE_NAME}/prefix/system.reg" "${BOTTLE_NAME}/system.reg.orig"
   cp "${BOTTLE_NAME}/prefix/user.reg" "${BOTTLE_NAME}/user.reg.orig"
+  
+  # Register AppName
+  echo -n ${APP_NAME} > "${BOTTLE_NAME}/app_name"
 
   echo "Done!"
   exit 0
@@ -68,7 +78,7 @@ function runWineComponent(){
 
   WINE_COMPONENT=$(echo ${COMMAND} | cut -c 3-);
 
-  "${HERE}"/wine $WINE_COMPONENT ${@}
+  "${HERE}"/wine $WINE_COMPONENT ${*} 2> /dev/null
   exit ${?}
 }
 
@@ -96,6 +106,7 @@ function printHelp(){
   echo "    Wine32-AppImage commands:"
   echo "      create-bottle  =>  Create a new bottle ith defaul settings"
   echo "      install        =>  Install a software from outside bottle"
+  echo "      package        =>  Package the bottle as AppImage"
   echo "      run            =>  Run a software under the bottle"
   echo
   echo "     Wine default command:"
@@ -107,7 +118,132 @@ function printHelp(){
   exit 1
 }
 
-COMMAND=${1}; shift
+function printPackageUsage(){
+  echo -ne "${1}"
+  echo -e "You must provide 3 arguments for package flag:\n"
+  echo -e "  [Executable path] [category] [icon path]\n"
+
+  echo -e "[Executable path] can be in one of these forms:\n"
+  echo -e "  * ${HOME}/prefix/drive_c/path/to/file.exe"
+  echo -e "  * C:/path/to/file.exe"
+  echo -e "  * C:\\\path\\\to\\\file.exe\n"
+  echo -e "[category] is where application will be placed on 'Applications Menu' of system"
+  echo -n "It is similar do Windows Start Menu but is separated by categories, the valid"
+  echo -e " categories is:"
+  echo " ${VALID_CATEGORIES[*]}" | sed "s| |\n * |g"
+  echo -e "\n[icon path] is the path of icon for application\n"
+  exit 1
+}
+
+function package(){
+  checkIfIsAnBottle
+  enterOnBottle
+
+  cd ${BOTTLE_NAME}
+
+  # Check passed argurments
+ [ -z "${1}" ] && printPackageUsage "Error: Wrong number of arguments\n"
+ [ -z "${2}" ] && printPackageUsage "Error: Wrong number of arguments\n"
+ [ -z "${3}" ] && printPackageUsage "Error: Wrong number of arguments\n"
+
+
+  # Check Exec
+  PREFIX=$(echo "${HOME}/prefix/drive_c")
+  EXEC=$(echo ${1} | sed "s|${PREFIX}|C:|g" | sed "s|\\\|/|g")
+  FILE=$(echo ${EXEC} | sed "s|C:|${PREFIX}|g")
+
+  if [ ! -f "$FILE" ]; then
+    echo -e "Error: Executable ${FILE} not found!"
+    exit 1
+  fi
+
+  # Check categories
+  VALID_CATEGORIES=(AudioVideo Audio Video Development 
+                    Education Game Graphics Network 
+                    Office Science Settings System Utility)
+
+  CATEGORY=$(echo " ${VALID_CATEGORIES[*]} " | grep -o " ${2} " | sed 's/ //g')
+  if [ "${CATEGORY}" == "" ]; then
+    echo -e "Error: You must provide a valid category!"
+    echo -e "A list of valid categories is shown below:"
+    echo " ${VALID_CATEGORIES[*]}" | sed "s| |\n * |g"
+    echo -e "\nYou can find an detailed explanation on following link:"
+    echo "https://specifications.freedesktop.org/menu-spec/latest/apa.html"
+    echo -e "\nYou was passed: ${2}"
+    exit 1
+  fi
+
+  # Check icon
+  ICON="${3}"
+  if [ ! -f "$ICON" ]; then
+    echo -e "Error: Icon file ${ICON} not found!"
+    exit 1
+  fi
+
+  # Copy icon
+  cp "$ICON" "${BOTTLE_NAME}.png"
+  ln -s "${BOTTLE_NAME}.png" ".DirIcon"
+
+  # Write Launcher
+  echo "[Desktop Entry]"          >  "${BOTTLE_NAME}.desktop"
+  echo "Name=$(cat app_name)"     >> "${BOTTLE_NAME}.desktop"
+  echo "Type=Application"         >> "${BOTTLE_NAME}.desktop"
+  echo "Categories=${CATEGORY};"  >> "${BOTTLE_NAME}.desktop"
+  echo "Icon=${BOTTLE_NAME}"      >> "${BOTTLE_NAME}.desktop"
+  echo "Exec=wine %f"             >> "${BOTTLE_NAME}.desktop"
+  echo "X-WineExec=\"${EXEC}\""   >> "${BOTTLE_NAME}.desktop"
+  
+  # Copy AppImage resources
+  echo "Copying Wine32-AppImage..."
+  cp -r "${HERE}/"* .
+  
+  # Strip unneeded files
+  echo "Removing unneeded files..."
+  ./strip $(cat unneeded_packages| sed 's/^/--purge-/g')
+
+  # Get differential between default system.reg and new
+  diff "./app/prefix/system.reg" "./system.reg.orig"       | \
+                  grep ^"<"                                | \
+                  grep -v "#time="                         | \
+                  rev                                      | \
+                  sed '/^[0-9]\{10\}/ s/ /#   /'           | \
+                  rev                                      | \
+                  cut -c 3-                                | \
+                  head -n -44                              | \
+                  sed 's/^\[S/\[HKEY_LOCAL_MACHINE\\S/g'   | \
+                  sed 's|\\\\|\\|g'                        | \
+                  >> "./improve.reg"
+
+  sed -i '15d' ./improve.reg
+
+  rm -rf "./app/prefix"
+  rm -rf "./user.reg.orig"
+  rm -rf "./system.reg.orig"
+  rm -rf "./strip"
+  rm -rf "./AppRun"
+  mv "WineLauncher" "AppRun"
+
+  exit 0
+}
+
+function strip(){
+  echo " ${@} " | sed 's/ /\n/g' >> "${BOTTLE_NAME}/unneeded_packages"
+  STRIP=$(cat "${BOTTLE_NAME}/unneeded_packages" | sort | uniq | sed '/^$/d')
+  echo -n "${STRIP}" > "${BOTTLE_NAME}/unneeded_packages"
+  exit 0
+}
+
+function noStrip(){
+  STRIP=$(cat "${BOTTLE_NAME}/unneeded_packages")
+  for var in "${@}";do
+    STRIP=$(echo -n "${STRIP}" | grep -v "${var}")
+  done
+  echo -n "${STRIP}" > "${BOTTLE_NAME}/unneeded_packages"
+  exit 0
+}
+
+COMMAND="${1}"; shift
+APP_NAME="${1}"
 BOTTLE_NAME=$(echo ${1} | sed "s|[[:space:]]|_|g") ; shift
 
 [ "${BOTTLE_NAME}" == "" ] && printHelp
@@ -115,7 +251,10 @@ BOTTLE_NAME=$(echo ${1} | sed "s|[[:space:]]|_|g") ; shift
 
 [ "${COMMAND}" == "create-bottle" ] && createBottle     ${@}
 [ "${COMMAND}" == "install" ]       && installApp       ${@}
-[ "${COMMAND}" == "run" ]           && run       ${@}
+[ "${COMMAND}" == "package" ]       && package          "${1}" "${2}" "${3}"
+[ "${COMMAND}" == "run" ]           && run              ${@}
+[ "${COMMAND}" == "--strip" ]       && strip            ${@}
+[ "${COMMAND}" == "--no-strip" ]    && noStrip          ${@}
 [ "${COMMAND}" == "--winecfg" ]     && runWineComponent ${@}
 [ "${COMMAND}" == "--regedit" ]     && runWineComponent ${@}
 [ "${COMMAND}" == "--taskmgr" ]     && runWineComponent ${@}

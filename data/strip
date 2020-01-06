@@ -85,16 +85,18 @@ function turnSymlink(){
 
 function purgeMono(){
   echo "Purging Mono..."
-
+  mkdir -p "${HERE}/app/windows/mono"
   folder_list=$(find "${HERE}/app/windows/mono" -type f)
   while read -r file_name; do
-    echo -n "" > "${file_name}"
+    if [ -f "${file_name}" ]; then
+      echo -n "" > "${file_name}"
+    fi
   done <<< "${folder_list}"
 }
 
 function purgeGecko(){
   echo "Purging Gecko..."
-
+  mkdir -p "${HERE}/app/windows/system32/gecko"
   folder_list=$(find "${HERE}/app/windows/system32/gecko" -type f)
   while read -r file_name; do
     echo -n "" > "${file_name}"
@@ -103,6 +105,8 @@ function purgeGecko(){
 
 function purgeTemp(){
   echo "Purging temporary dir..."
+  
+  mv "${HERE}/prefix" "${HERE}/app"
 
   # Remove directory
   rm -rf "${HERE}/include" 
@@ -110,6 +114,17 @@ function purgeTemp(){
   rm -rf "${HERE}/app/windows/Installer"
   rm -rf "${HERE}/app/windows/temp"
   rm -rf "${HERE}/app/users"
+  
+  # Remove $HOME related files
+  
+  rm -rf "${HERE}/.cache"
+  rm -rf "${HERE}/.local"
+  rm -rf "${HERE}/.wget-hsts"
+  rm -rf "${HERE}/.fontconfig"
+  rm -rf "${HERE}/Wine.png"
+  rm -rf "${HERE}/wine.desktop"
+  rm -rf "${HERE}/app_name"
+  rm -rf "${HERE}/unneeded_packages"
 
   # Recreate as file
   echo -n "" > "${HERE}/app/windows/Installer"
@@ -123,6 +138,10 @@ function purgeWindows(){
   rm -rf "${HERE}/app/windows"
   echo -n "" > "${HERE}/app/windows"
   export NO_LINK_WINDOWS=1
+}
+
+function purgeStyle(){
+  rm -rf "${HERE}/kupofl" 
 }
 
 function purgeMesa3D(){
@@ -148,14 +167,12 @@ if [ "${1}" = "--help" ]; then
   printHelp 
 elif [ "${1}" = "--license" ]; then
   printLicense
-elif [ "${1}" = "" ]; then
-  printHelp 
 fi
 
 ######################################################################################
 
-if [ -d "${HERE}/drive_c" ]; then
-  mv "${HERE}/drive_c" "${HERE}/app"
+if [ -d "${HERE}/prefix/drive_c" ]; then
+  mv "${HERE}/prefix/drive_c" "${HERE}/app"
 fi
 
 ######################################################################################
