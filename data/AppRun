@@ -29,6 +29,9 @@ function createBottle(){
   # Create strip data
   echo -n > "${BOTTLE_NAME}/unneeded_packages"
 
+  # Create file that warns if is to copy app files (by default no)
+  echo -n "no" > "${BOTTLE_NAME}/copy_app_files"
+
   # Backup registry
   cp "${BOTTLE_NAME}/prefix/system.reg" "${BOTTLE_NAME}/system.reg.orig"
   cp "${BOTTLE_NAME}/prefix/user.reg" "${BOTTLE_NAME}/user.reg.orig"
@@ -99,39 +102,47 @@ function enterOnBottle(){
 
 function printHelp(){
   echo "  Usage:"
-  echo "   ${APPIMAGE} [command] [bottle name] [options]"
+  echo "   ${APPIMAGE} [command] [bottle name] [value]"
   echo
   echo "  Available commands are:"
   echo
   echo "    Wine32-AppImage commands:"
-  echo "      create-bottle  =>  Create a new bottle ith defaul settings"
-  echo "      install        =>  Install a software from outside bottle"
-  echo "      package        =>  Package the bottle as AppImage"
-  echo "      run            =>  Run a software under the bottle"
+  echo "      create-bottle    =>  Create a new bottle with default settings"
+  echo "      install          =>  Install a software from outside bottle"
+  echo "      package          =>  Package the bottle as AppImage"
+  echo "      run              =>  Run a software already on the bottle"
+  echo
+  echo "    Flags to modify behavior of Wine launcher:"
+  echo "      -copy-app-files  =>  Defines if app files will extracted of AppImage"
   echo
   echo "     Wine default command:"
-  echo "      --winetricks   =>  Open Winetricks"
-  echo "      --winecfg      =>  Open Wine configurator"
-  echo "      --regedit      =>  Open Wine register editor"
-  echo "      --taskmgr      =>  Open a task manager for wine apps"
-  echo "      --uninstaller  =>  Open the 'Wine Uninstaller'"
+  echo "      --winetricks     =>  Open Winetricks"
+  echo "      --winecfg        =>  Open Wine configurator"
+  echo "      --regedit        =>  Open Wine register editor"
+  echo "      --taskmgr        =>  Open a task manager for wine apps"
+  echo "      --uninstaller    =>  Open the 'Wine Uninstaller'"
+  echo
+  echo "  Note: Flags accepts only 'yes' or 'no' as value"
   exit 1
 }
 
 function printPackageUsage(){
-  echo -ne "${1}"
-  echo -e "You must provide 3 arguments for package flag:\n"
-  echo -e "  [Executable path] [category] [icon path]\n"
+  echo -ne "  ${1}"
+  echo -e "  You must provide 3 arguments for package flag:\n"
+  echo -e "    [Executable path] [category] [icon path]\n"
 
-  echo -e "[Executable path] can be in one of these forms:\n"
-  echo -e "  * ${HOME}/prefix/drive_c/path/to/file.exe"
-  echo -e "  * C:/path/to/file.exe"
-  echo -e "  * C:\\\path\\\to\\\file.exe\n"
-  echo -e "[category] is where application will be placed on 'Applications Menu' of system"
-  echo -n "It is similar do Windows Start Menu but is separated by categories, the valid"
-  echo -e " categories is:"
-  echo " ${VALID_CATEGORIES[*]}" | sed "s| |\n * |g"
-  echo -e "\n[icon path] is the path of icon for application\n"
+  echo -e "  [Executable path] can be in one of these forms:\n"
+  echo -e "    * ${HOME}/prefix/drive_c/path/to/file.exe"
+  echo -e "    * C:/path/to/file.exe"
+  echo -e "    * C:\\\path\\\to\\\file.exe\n"
+  echo -e "  [category] is where application will be placed on 'Menu' of system,"
+  echo -e "  is similar do Windows Start Menu but is separated by categories."
+  echo -e "  The valid categories is:"
+  echo " ${VALID_CATEGORIES[*]}" | sed "s| |\n    * |g"
+  echo -e "\n  [icon path] is the path of icon for application is called outside bottle."
+  echo -e "  icon must be in PNG format and is recommended a 256x256px for resolution"
+  echo -e "    * /full/path/to/icon.png"
+  echo -e "    * path/in/current/dir/icon.png"
   exit 1
 }
 
@@ -242,6 +253,25 @@ function noStrip(){
   exit 0
 }
 
+function setFlag(){
+  checkIfIsAnBottle 
+  enterOnBottle
+  FILE=$(echo ${COMMAND} | cut -c 2- | sed 's/-/_/g')
+  VALID_OPTIONS=("yes" "no")
+
+  if [[ " ${VALID_OPTIONS[@]} " =~ " ${1} " ]]; then
+    echo -n "${1}" > "${BOTTLE_NAME}/${FILE}"
+    exit 0
+  fi
+
+  echo -e "  Error: Invalid value passed flags accepts only 'yes' and 'no'\n"
+  echo -e "    To activate ${COMMAND} use:"
+  echo -e "      ... ${COMMAND} yes"
+  echo -e "    To deactivate ${COMMAND} use:"
+  echo -e "      ... ${COMMAND} no"
+  exit 1
+}
+
 COMMAND="${1}"; shift
 APP_NAME="${1}"
 BOTTLE_NAME=$(echo ${1} | sed "s|[[:space:]]|_|g") ; shift
@@ -249,16 +279,17 @@ BOTTLE_NAME=$(echo ${1} | sed "s|[[:space:]]|_|g") ; shift
 [ "${BOTTLE_NAME}" == "" ] && printHelp
 [ "${COMMAND}"     == "" ] && printHelp
 
-[ "${COMMAND}" == "create-bottle" ] && createBottle     ${@}
-[ "${COMMAND}" == "install" ]       && installApp       ${@}
-[ "${COMMAND}" == "package" ]       && package          "${1}" "${2}" "${3}"
-[ "${COMMAND}" == "run" ]           && run              ${@}
-[ "${COMMAND}" == "--strip" ]       && strip            ${@}
-[ "${COMMAND}" == "--no-strip" ]    && noStrip          ${@}
-[ "${COMMAND}" == "--winecfg" ]     && runWineComponent ${@}
-[ "${COMMAND}" == "--regedit" ]     && runWineComponent ${@}
-[ "${COMMAND}" == "--taskmgr" ]     && runWineComponent ${@}
-[ "${COMMAND}" == "--winetricks" ]  && runWineComponent ${@}
-[ "${COMMAND}" == "--uninstaller" ] && runWineComponent ${@}
+[ "${COMMAND}" == "create-bottle" ]   && createBottle     ${@}
+[ "${COMMAND}" == "install" ]         && installApp       ${@}
+[ "${COMMAND}" == "package" ]         && package          "${1}" "${2}" "${3}"
+[ "${COMMAND}" == "run" ]             && run              ${@}
+[ "${COMMAND}" == "-copy-app-files" ] && setFlag          ${@}
+[ "${COMMAND}" == "--strip" ]         && strip            ${@}
+[ "${COMMAND}" == "--no-strip" ]      && noStrip          ${@}
+[ "${COMMAND}" == "--winecfg" ]       && runWineComponent ${@}
+[ "${COMMAND}" == "--regedit" ]       && runWineComponent ${@}
+[ "${COMMAND}" == "--taskmgr" ]       && runWineComponent ${@}
+[ "${COMMAND}" == "--winetricks" ]    && runWineComponent ${@}
+[ "${COMMAND}" == "--uninstaller" ]   && runWineComponent ${@}
 
 printHelp

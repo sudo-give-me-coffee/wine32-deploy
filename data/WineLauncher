@@ -32,11 +32,20 @@ mkdir -p "${WINEPREFIX}/drive_c"
 trap cleanup EXIT
      cleanup
 
+if [ "$(cat ${HERE}/copy_app_files)" == "yes" ]; then
+  if [ ! -f "${WINEPREFIX}/already_copied" ]; then
+    echo "${APP_FILES}" | grep -v "windows"$ | sed "s/^/cp -vr \"/g" | sed "s|$|\" ${WINEPREFIX}/drive_c|" | sh
+    touch "${WINEPREFIX}/already_copied"
+  fi
+  export APP_FILES=$(echo "${APP_FILES}" | grep "windows"$)
+fi
+
 echo "${APP_FILES}" | sed "s|^|ln -s \"|" | sed "s|$|\" ${WINEPREFIX}/drive_c|" | sh
 
 if [ ! -f "${WINEPREFIX}/system.reg" ]; then
-  cp "${HERE}/improve.reg" "${WINEPREFIX}/drive_c/default.reg"
-  "${HERE}/wine" create-register "${WINEPREFIX}/drive_c/default.reg"
+  echo -e "${IMPROVE_REG}\n\n" > "${WINEPREFIX}/default.reg"
+  "${HERE}/wine" create-register "${WINEPREFIX}/default.reg"
 fi
 
 LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${APP_PATH}" ${*} 2>&1 | grep -v ":fixme:"
+
