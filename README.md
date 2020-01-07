@@ -162,6 +162,9 @@ At last, the commands for Wine tools bundled with **wine32-appimage**:
 * [taskmgr](https://wiki.winehq.org/Taskmgr)
 * [uninstaller](https://wiki.winehq.org/Uninstaller)
 
-# License
-* [uninstaller](LICENSE.md)
+# Credits:
+* [win32-appimage](LICENSE.md)
+* [Hook and preloader](https://github.com/Hackerl)
+* [Wine](https://www.winehq.org/)
+* [Visual Style](https://www.deviantart.com/lassekongo83/art/Kupo-Finale-for-XP-107950198)
 
