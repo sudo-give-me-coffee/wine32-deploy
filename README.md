@@ -43,7 +43,13 @@ chmod +x Wine-*-x86_64.AppImage
 ```bash 
 ./Wine-*-x86_64.AppImage run "My Bottle" "C:/Where/Application/was/installed/application.exe"
 ```
-8.  Let's package it:
+8. Remove unnecessary resources:
+
+```bash 
+./Wine-*-x86_64.AppImage --strip "My Bottle" mono gecko
+```
+
+9.  Let's package it:
 ```bash 
 ./Wine-*-x86_64.AppImage package "My Bottle"              \
     "C:/Where/Application/was/installed/application.exe"  \
@@ -62,6 +68,7 @@ The **wine32-appimage** Commands
 | create-bottle   | => | Create a new bottle with default settings       |
 | install         | => | Install a software from outside bottle          |
 | run             | => | Run a software already on the bottle            |
+| --strip         | => | Remove unnecessary resources                    |
 | package         | => | Package the bottle as AppImage                  |
 
 Usage per command:
@@ -77,6 +84,21 @@ The "Bottle Name" is also "App Name"
 install  "Bottle Name" "path/to/file.exe"
 ```
 The "path/to/file.exe" is relative to current directory, and no need to be inside om "bottle"
+
+* --strip:
+```
+--strip  "Bottle Name" resource
+```
+"resource" can be any of these things:
+
+```
+ 
+  mesa3D   -->  Support for DirectX 8 apps
+  windows  -->  Wine hardcoded libs (not recommended in most cases)
+  gecko    -->  Trident open source replacement (needed by applications that displays HTML content)
+  mono     -->  Open source replacement for .NET Framework (with Windows Forms)
+  
+```
 
 * run:
 ```
