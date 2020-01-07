@@ -13,10 +13,10 @@ distributions.</p>
 
 The basic usage is relative simple and use only 8 steps is basically composed bt 2 groups of steps:
 
-#### First group: Create a bottle
+#### First group: Create the bottle
 
 1. Download Wine AppImage by clicking on "**Downloads**" link above and selecting desired version
-2. Open a terminal where you has Wine AppImage
+2. Open a terminal where you has Win32 AppImage
 3. Turn it executable:
 ```bash 
 chmod +x Wine-*-x86_64.AppImage
@@ -38,7 +38,7 @@ chmod +x Wine-*-x86_64.AppImage
 
 #### Second group: Package as AppImage::
 
-7. First test your application:
+7. First, test your application:
 
 ```bash 
 ./Wine-*-x86_64.AppImage run "My Bottle" "C:/Where/Application/was/installed/application.exe"
