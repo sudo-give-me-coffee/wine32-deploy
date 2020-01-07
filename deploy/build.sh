@@ -47,7 +47,8 @@ aptitude -y -d -o dir::cache::archives="${PackagesDirectory}" install libwine:i3
 
 # Extract WINE
 
-tar -xzf "PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz" -C "${WorkingDir}"
+tar -xzf "PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz" -C "${WorkingDir}" || \
+tar -xjf "PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz" -C "${WorkingDir}"
 
 # Copy wine dependencies to AppDir
 
