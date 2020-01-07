@@ -4,7 +4,7 @@
 
 export ARCH="x86_64"
 export Version="4.21"
-export BuildDependencies="aptitude wget file gzip curl cabextract"
+export BuildDependencies="aptitude wget file gzip bzip2 curl cabextract"
 export WorkingDir="Wine.AppDir"
 export PackagesDirectory='/tmp/.cache'
 export wgetOptions="-nv -c --show-progress --progress=bar:force:noscroll"
