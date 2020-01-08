@@ -185,6 +185,9 @@ function package(){
 
   # Check icon
   ICON="${3}"
+  if [ "${ICON:0:1}" != "/" ]; then
+    ICON="../${ICON}"
+  fi
   if [ ! -f "$ICON" ]; then
     echo -e "Error: Icon file ${ICON} not found!"
     exit 1
