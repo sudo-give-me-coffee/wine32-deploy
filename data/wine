@@ -56,7 +56,7 @@ if [ "${1}" == "--run" ]; then
   exit $?
 fi
 
-silent_instal_switches=( '/silent' '/verysilent' '/sd' '/s' '/q' )
+silent_instal_switches=(  '/silent' '/verysilent' '/sd' '/s' '/q' '/s /l' '/silent /install' )
 if [[ " ${silent_instal_switches[@]} " =~ " $(echo ${2} | tr A-Z a-z) " ]]; then
   "${WINELDLIBRARY}" "${HERE}/bin/wine" "${1}" "${2}" 2>&1 | grep -v ":fixme:"
   exit 0
