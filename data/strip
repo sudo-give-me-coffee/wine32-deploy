@@ -142,6 +142,7 @@ function purgeWindows(){
 
 function purgeStyle(){
   rm -rf "${HERE}/kupofl" 
+  rm -rf "${HERE}/app/windows/Resources/Themes/kupofl" 
 }
 
 function purgeMesa3D(){
@@ -200,7 +201,7 @@ find "${HERE}"                                        | \
      sed 's/^/\$\(which strip\) --strip-unneeded "/g' | \
      sed 's/$/"/g'                                    | \
      sh 2> /dev/null
-
+  
 ######################################################################################
 
 echo "Done!"

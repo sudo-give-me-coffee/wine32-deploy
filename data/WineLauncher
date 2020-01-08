@@ -24,8 +24,6 @@ export LD_LIBRARY_PATH="${HERE}/usr/lib/i386-linux-gnu/alsa-lib":${LD_LIBRARY_PA
 export FONTCONFIG_PATH="${HERE}/etc/fonts"
 export WINELDLIBRARY="${HERE}/lib/ld-linux.so.2"
 export LD_PRELOAD="${HERE}/bin/libhookexecv.so" 
-export TODAY="$(date '+%Y%m%d')"
-export IMPROVE_REG=$(cat "${HERE}/improve.reg" | sed "/\"InstallDate\"/c\{Insert install date here}")
 
 mkdir -p "${WINEPREFIX}/drive_c"
 
@@ -43,7 +41,9 @@ fi
 echo "${APP_FILES}" | sed "s|^|ln -s \"|" | sed "s|$|\" ${WINEPREFIX}/drive_c|" | sh
 
 if [ ! -f "${WINEPREFIX}/system.reg" ]; then
-  echo -e "${IMPROVE_REG}\n\n" > "${WINEPREFIX}/default.reg"
+  export TODAY="$(date '+%Y%m%d')"
+  cp "${HERE}/improve.reg" "${WINEPREFIX}/default.reg"
+  sed -i "s/{Install date here}/\"InstallDate\"=\"${TODAY}\"/g" "${WINEPREFIX}/default.reg"
   "${HERE}/wine" create-register "${WINEPREFIX}/default.reg"
 fi
 

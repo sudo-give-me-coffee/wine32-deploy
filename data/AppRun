@@ -48,7 +48,6 @@ function installApp(){
   enterOnBottle
 
   # Check if file exist
-  
   if [ "$1" == "" ]; then
     echo "Error: You must provide a file"
     exit 1
@@ -57,7 +56,7 @@ function installApp(){
     exit 1
   fi
 
-  "${HERE}"/wine "${1}"
+  "${HERE}"/wine "${1}" "${2}"
   exit ${?}
 }
 
@@ -212,21 +211,23 @@ function package(){
   echo "Removing unneeded files..."
   ./strip $(cat unneeded_packages| sed 's/^/--purge-/g')
 
-  # Get differential between default system.reg and new
-  diff "./app/prefix/system.reg" "./system.reg.orig"       | \
-                  grep ^"<"                                | \
-                  grep -v "#time="                         | \
-                  rev                                      | \
-                  sed '/^[0-9]\{10\}/ s/ /#   /'           | \
-                  rev                                      | \
-                  cut -c 3-                                | \
-                  head -n -44                              | \
-                  sed 's/^\[S/\[HKEY_LOCAL_MACHINE\\S/g'   | \
-                  sed 's|\\\\|\\|g'                        | \
-                  >> "./improve.reg"
-
-  sed -i '15d' ./improve.reg
-
+  echo "Getting differential entries on regedit..."
+  
+  SYSTEM=$(diff "./app/prefix/system.reg" "./system.reg.orig"  | \
+                                                    grep ^"<"  | \
+                                             grep -v "#time="  | \
+                                                          rev  | \
+                               sed '/^[0-9]\{10\}/ s/ /#   /'  | \
+                                                          rev  | \
+                                                    cut -c 3-  | \
+                                                  head -n -44  | \
+                       sed 's/^\[S/\[HKEY_LOCAL_MACHINE\\S/g'  | \
+                                      sed '/^\[/ s|\\\\|\\|g'  | \
+                 sed "/\"InstallDate\"/c\{Install date here}"  )
+                  
+  echo "${SYSTEM}" >> ./improve.reg
+  echo "" >> ./improve.reg
+  
   rm -rf "./app/prefix"
   rm -rf "./user.reg.orig"
   rm -rf "./system.reg.orig"
