@@ -9,7 +9,7 @@ distributions.</p>
 
 <hr>
 
-# Basic usage
+# Basic usage:
 
 The basic usage is relative simple and use only 8 steps and is basically composed by composed bt 2 groups of steps:
 
