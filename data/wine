@@ -51,17 +51,17 @@ if [ "$1" == "regedit" ]; then
   exit $?
 fi
 
-if [ "$1" == "--run" ]; then
+if [ "${1}" == "--run" ]; then
   "${WINELDLIBRARY}" "${HERE}/bin/wine" "${*}" 2>&1 | grep -v ":fixme:" > /dev/null
   exit $?
 fi
 
+silent_instal_switches=( '/silent' '/verysilent' '/sd' '/s' '/q' )
+if [[ " ${silent_instal_switches[@]} " =~ " $(echo ${2} | tr A-Z a-z) " ]]; then
+  "${WINELDLIBRARY}" "${HERE}/bin/wine" "${1}" "${2}" 2>&1 | grep -v ":fixme:"
+  exit 0
+fi
+
 "${WINELDLIBRARY}" "${HERE}/bin/wine" "${*}" 2>&1 | grep -v ":fixme:"
 exit $?
-
-
-
-
-
-
 
