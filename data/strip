@@ -132,6 +132,31 @@ function purgeTemp(){
 }
 
 
+# MS Core fonts can't be distributed, so let's replace it with a FOSS equivalents
+# Note that is a WIP and not cover all fonts
+function replaceProprietaryFonts(){
+  cd "${HERE}/app/windows/Fonts/"
+  # Courier New
+  if [ "$(ls cour*.ttf)" != "" ]; then
+    rm "cour"*".ttf"
+    tar -xzf "${HERE}/LiberationMono.tar.gz"
+  fi
+  # Times New Roman
+  if [ "$(ls times*.ttf)" != "" ]; then
+    rm "times"*".ttf"
+    tar -xzf "${HERE}/LiberationSerif.tar.gz"
+  fi
+  # Arial
+  if [ "$(ls arial*.ttf)" != "" ]; then
+    rm "arial"*".ttf"
+    tar -xzf "${HERE}/LiberationSans.tar.gz"
+  fi
+  cd "${HERE}"
+  rm "${HERE}/LiberationSans.tar.gz"
+  rm "${HERE}/LiberationSerif.tar.gz"
+  rm "${HERE}/LiberationMono.tar.gz"
+}
+
 function purgeWindows(){
   echo "Purging 'windows' dir..."
 
@@ -202,6 +227,10 @@ find "${HERE}"                                        | \
      sed 's/$/"/g'                                    | \
      sh 2> /dev/null
   
+######################################################################################
+
+replaceProprietaryFonts 2> /dev/null
+
 ######################################################################################
 
 echo "Done!"
