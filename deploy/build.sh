@@ -14,6 +14,9 @@ export DownloadURLs=(
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/libhookexecv.so"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/wine-preloader_hook"
   "https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks"
+  "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationMono.tar.gz"
+  "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationSans.tar.gz"
+  "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationSerif.tar.gz"
   )
 
 # Install build deps
@@ -48,7 +51,7 @@ wget -q "http://ftp.us.debian.org/debian/pool/main/libp/libpng/libpng12-0_1.2.50
 
 # Extract WINE
 
-tar -xzf "PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz" -C "${WorkingDir}" || \
+tar -xzf "PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz" -C "${WorkingDir}" 2> /dev/null || \
 tar -xjf "PlayOnLinux-wine-${Version}-upstream-linux-x86.tar.gz" -C "${WorkingDir}"
 
 # Copy wine dependencies to AppDir
@@ -62,6 +65,7 @@ mv "libhookexecv.so" "${WorkingDir}/bin"
 mv "wine-preloader_hook" "${WorkingDir}/bin"
 mv "winetricks" "${WorkingDir}/bin"
 mv "${WorkingDir}/kupofl.msstyles" "${WorkingDir}/kupofl/"
+mv Liberation*.tar.gz "${WorkingDir}"
 cp "$(which cabextract)" "${WorkingDir}/bin"
 
 # Build AppImage
