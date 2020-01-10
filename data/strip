@@ -151,10 +151,13 @@ function replaceProprietaryFonts(){
     rm "arial"*".ttf"
     tar -xzf "${HERE}/LiberationSans.tar.gz"
   fi
+  # Andale Mono
+  if [ "$(ls andalemo.ttf)" != "" ]; then
+    rm "arial"*".ttf"
+    tar -xzf "${HERE}/DejaVuSansMono.tar.gz"
+  fi
   cd "${HERE}"
-  rm "${HERE}/LiberationSans.tar.gz"
-  rm "${HERE}/LiberationSerif.tar.gz"
-  rm "${HERE}/LiberationMono.tar.gz"
+  rm "${HERE}/"*".tar.gz"
 }
 
 function purgeWindows(){
