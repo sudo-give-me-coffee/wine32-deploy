@@ -17,6 +17,7 @@ export DownloadURLs=(
   "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationMono.tar.gz"
   "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationSans.tar.gz"
   "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationSerif.tar.gz"
+  "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/DejaVuSansMono.tar.gz"
   )
 
 # Install build deps
@@ -66,6 +67,7 @@ mv "wine-preloader_hook" "${WorkingDir}/bin"
 mv "winetricks" "${WorkingDir}/bin"
 mv "${WorkingDir}/kupofl.msstyles" "${WorkingDir}/kupofl/"
 mv Liberation*.tar.gz "${WorkingDir}"
+mv DejaVuSans*.tar.gz "${WorkingDir}"
 cp "$(which cabextract)" "${WorkingDir}/bin"
 
 # Build AppImage
