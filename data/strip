@@ -153,7 +153,7 @@ function replaceProprietaryFonts(){
   fi
   # Andale Mono
   if [ "$(ls andalemo.ttf)" != "" ]; then
-    rm "arial"*".ttf"
+    rm "andalemo.ttf"
     tar -xzf "${HERE}/DejaVuSansMono.tar.gz"
   fi
   cd "${HERE}"
