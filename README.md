@@ -30,6 +30,7 @@ chmod +x Wine-*-x86_64.AppImage
 ```bash 
 ./Wine-*-x86_64.AppImage winetricks "My Bottle"
 ```
+> Please read [How to package fonts](https://github.com/sudo-give-me-coffee/win32-appimage/wiki/How-to-package-fonts) if you want use winetricks to install fonts
 
 6. Install your application:
 ```bash 
