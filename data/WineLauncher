@@ -47,5 +47,9 @@ if [ ! -f "${WINEPREFIX}/system.reg" ]; then
   "${HERE}/wine" create-register "${WINEPREFIX}/default.reg"
 fi
 
+if [ "$(cat ${HERE}/change-directory)" == "yes" ]; then
+  cd "$(dirname "${APP_PATH}")"
+fi
+
 LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${APP_PATH}" ${*} 2>&1 | grep -v ":fixme:"
 

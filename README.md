@@ -128,9 +128,10 @@ At last "path/to/icon.png" is the icon of your program, the path is relative to 
 
 The **WineLauncher** Commands
 
-| Command         |    | What its does                                   |
-|-----------------|----|-------------------------------------------------|
-| -copy-app-files | => | Defines if app files will extracted of AppImage |
+| Command           |    | What its does                                   |
+|-------------------|----|-------------------------------------------------|
+| -copy-app-files   | => | Defines if app files will extracted of AppImage |
+| -change-directory | => | Changes directory to app folder before run      |
 
 They receives only "yes" or "no" as value for example:
 

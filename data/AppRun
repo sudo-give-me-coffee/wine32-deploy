@@ -29,8 +29,9 @@ function createBottle(){
   # Create strip data
   echo -n > "${BOTTLE_NAME}/unneeded_packages"
 
-  # Create file that warns if is to copy app files (by default no)
+  # Create flags with default values
   echo -n "no" > "${BOTTLE_NAME}/copy_app_files"
+  echo -n "no" > "${BOTTLE_NAME}/change-directory"
 
   # Backup registry
   cp "${BOTTLE_NAME}/prefix/system.reg" "${BOTTLE_NAME}/system.reg.orig"
@@ -106,20 +107,21 @@ function printHelp(){
   echo "  Available commands are:"
   echo
   echo "    Wine32-AppImage commands:"
-  echo "      create-bottle    =>  Create a new bottle with default settings"
-  echo "      install          =>  Install a software from outside bottle"
-  echo "      package          =>  Package the bottle as AppImage"
-  echo "      run              =>  Run a software already on the bottle"
+  echo "      create-bottle      =>  Create a new bottle with default settings"
+  echo "      install            =>  Install a software from outside bottle"
+  echo "      package            =>  Package the bottle as AppImage"
+  echo "      run                =>  Run a software already on the bottle"
   echo
   echo "    Flags to modify behavior of Wine launcher:"
-  echo "      -copy-app-files  =>  Defines if app files will extracted of AppImage"
+  echo "      -copy-app-files    =>  Defines if app files will extracted of AppImage"
+  echo "      -change-directory  =>  Changes directory to app folder before run"
   echo
   echo "     Wine default command:"
-  echo "      --winetricks     =>  Open Winetricks"
-  echo "      --winecfg        =>  Open Wine configurator"
-  echo "      --regedit        =>  Open Wine register editor"
-  echo "      --taskmgr        =>  Open a task manager for wine apps"
-  echo "      --uninstaller    =>  Open the 'Wine Uninstaller'"
+  echo "      --winetricks       =>  Open Winetricks"
+  echo "      --winecfg          =>  Open Wine configurator"
+  echo "      --regedit          =>  Open Wine register editor"
+  echo "      --taskmgr          =>  Open a task manager for wine apps"
+  echo "      --uninstaller      =>  Open the 'Wine Uninstaller'"
   echo
   echo "  Note: Flags accepts only 'yes' or 'no' as value"
   exit 1
@@ -283,17 +285,18 @@ BOTTLE_NAME=$(echo ${1} | sed "s|[[:space:]]|_|g") ; shift
 [ "${BOTTLE_NAME}" == "" ] && printHelp
 [ "${COMMAND}"     == "" ] && printHelp
 
-[ "${COMMAND}" == "create-bottle" ]   && createBottle     ${@}
-[ "${COMMAND}" == "install" ]         && installApp       ${@}
-[ "${COMMAND}" == "package" ]         && package          "${1}" "${2}" "${3}"
-[ "${COMMAND}" == "run" ]             && run              ${@}
-[ "${COMMAND}" == "-copy-app-files" ] && setFlag          ${@}
-[ "${COMMAND}" == "--strip" ]         && strip            ${@}
-[ "${COMMAND}" == "--no-strip" ]      && noStrip          ${@}
-[ "${COMMAND}" == "--winecfg" ]       && runWineComponent ${@}
-[ "${COMMAND}" == "--regedit" ]       && runWineComponent ${@}
-[ "${COMMAND}" == "--taskmgr" ]       && runWineComponent ${@}
-[ "${COMMAND}" == "--winetricks" ]    && runWineComponent ${@}
-[ "${COMMAND}" == "--uninstaller" ]   && runWineComponent ${@}
+[ "${COMMAND}" == "create-bottle" ]     && createBottle     ${@}
+[ "${COMMAND}" == "install" ]           && installApp       ${@}
+[ "${COMMAND}" == "package" ]           && package          "${1}" "${2}" "${3}"
+[ "${COMMAND}" == "run" ]               && run              ${@}
+[ "${COMMAND}" == "-copy-app-files" ]   && setFlag          ${@}
+[ "${COMMAND}" == "-change-directory" ] && setFlag          ${@}
+[ "${COMMAND}" == "--strip" ]           && strip            ${@}
+[ "${COMMAND}" == "--no-strip" ]        && noStrip          ${@}
+[ "${COMMAND}" == "--winecfg" ]         && runWineComponent ${@}
+[ "${COMMAND}" == "--regedit" ]         && runWineComponent ${@}
+[ "${COMMAND}" == "--taskmgr" ]         && runWineComponent ${@}
+[ "${COMMAND}" == "--winetricks" ]      && runWineComponent ${@}
+[ "${COMMAND}" == "--uninstaller" ]     && runWineComponent ${@}
 
 printHelp
