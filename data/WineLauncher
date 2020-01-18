@@ -9,6 +9,8 @@ function cleanup() {
   fi
 }
 
+[ "${XDG_CONFIG_HOME}" = "" ] && export XDG_CONFIG_HOME="${HOME}/.config"
+
 export HERE="$(dirname "$(readlink -f "${0}")")"
 export APP_ID=$(basename -s .desktop $(ls "${HERE}/"*".desktop"))
 export APP_PATH=$(cat "${HERE}/${APP_ID}.desktop" | grep ^"X-WineExec=" | cut -c 13- | sed 's/.$//')
