@@ -44,6 +44,7 @@ if [ ! -f "${WINEPREFIX}/system.reg" ]; then
   export TODAY="$(date '+%Y%m%d')"
   cp "${HERE}/improve.reg" "${WINEPREFIX}/default.reg"
   sed -i "s/{Install date here}/\"InstallDate\"=\"${TODAY}\"/g" "${WINEPREFIX}/default.reg"
+  "${WINELDLIBRARY}" "${HERE}/bin/wineserver" --persistent=1
   "${HERE}/wine" create-register "${WINEPREFIX}/default.reg"
 fi
 
@@ -51,5 +52,22 @@ if [ "$(cat ${HERE}/change-directory)" == "yes" ]; then
   cd "$(dirname "${APP_PATH}")"
 fi
 
-LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${APP_PATH}" ${*} 2>&1 | grep -v ":fixme:"
+APP_PATH=$(echo "${HERE}/app/$(echo "${APP_PATH}" | cut -c 4-)")
+"${WINELDLIBRARY}" "${HERE}/bin/wine" "${APP_PATH}" ${*} 2>&1 | grep -v ":fixme:"  &
 
+INVALID_APP_STATUS=( "" "Z" )
+
+# Kill wineserver after app closes
+while true; do 
+  [ "${APP_PID}" = "" ] && {
+     APP_PID=$(ps -e -o pid,cmd | $(which grep) "${APP_PATH}"       \
+                                | $(which grep) -v "$(which grep)"  \
+                                | sed 's/^ //' | cut -d' ' -f1)
+  }
+  APP_STATUS=$(ps -q $APP_PID -o state --no-headers)
+  if [[ " ${INVALID_APP_STATUS[@]} " =~ " ${APP_STATUS} " ]]; then
+    "${WINELDLIBRARY}" "${HERE}/bin/wineserver" -k
+    exit
+  fi
+  sleep 0.3
+done
