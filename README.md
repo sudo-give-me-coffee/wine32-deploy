@@ -4,62 +4,13 @@
   Win32-AppImage | <a href="https://github.com/sudo-give-me-coffee/wine-appimage/releases/tag/continuous">Downloads</a>
 </h1>
 
-<p align="center"><i>"A simple, lightweight way to distribute the 32-bit Microsoft Windows® application on Linux"</i>.<br> It works on Ubuntu, Fedora, Debian, their derivates and all other major Linux
+<p align="center"><i>"A simple and lightweight way to distribute the 32-bit Microsoft Windows® application on Linux"</i>.<br> It works on most Linux
 distributions.</p>
 
 <hr>
 
-# Basic usage:
-
-The basic usage is relative simple and use only 8 steps and is basically composed by composed bt 2 groups of steps:
-
-#### First group: Create the bottle
-
-1. Download Wine AppImage by clicking on "**Downloads**" link above and selecting desired version
-2. Open a terminal where you has Win32 AppImage
-3. Turn it executable:
-```bash 
-chmod +x Wine-*-x86_64.AppImage
-```
-4. Create an bottle:
-```bash 
-./Wine-*-x86_64.AppImage create-bottle "My Bottle"
-```
-
-5. Modify with winetricks (if needed):
-```bash 
-./Wine-*-x86_64.AppImage winetricks "My Bottle"
-```
-> Please read [How to package fonts avoiding copyright infringement](https://github.com/sudo-give-me-coffee/win32-appimage/wiki/Packaging-fonts) if you want use winetricks to install fonts
-
-6. Install your application:
-```bash 
-./Wine-*-x86_64.AppImage install "My Bottle" "/path/to/my/application-setup.exe"
-```
-
-#### Second group: Package as AppImage::
-
-7. First, test your application:
-
-```bash 
-./Wine-*-x86_64.AppImage run "My Bottle" "C:/Where/Application/was/installed/application.exe"
-```
-8. Remove unnecessary resources:
-
-```bash 
-./Wine-*-x86_64.AppImage --strip "My Bottle" mono gecko
-```
-
-9.  Let's package it:
-```bash 
-./Wine-*-x86_64.AppImage package "My Bottle"              \
-    "C:/Where/Application/was/installed/application.exe"  \
-    Utility
-    "data/icon.png"
-```
-
-# A more detailed usage:
-The **wine32-appimage** Commands
+# Usage:
+The **wine32-deploy** Commands
 
 > Note: All commands must receive a bottle name
 
@@ -152,11 +103,11 @@ At last, the commands for Wine tools bundled with **wine32-appimage**:
 
 | Command         |    | What its does                                   |
 |-----------------|----|-------------------------------------------------|
-| --winetricks    | => | Open Winetricks                                 |
-| --winecfg       | => | Open Wine configurator                          |
-| --regedit       | => | Open Wine register editor                       |
-| --taskmgr       | => | Open a task manager for wine apps               |
-| --uninstaller   | => | Open the 'Wine Uninstaller'                     |
+| winetricks    | => | Open Winetricks                                 |
+| winecfg       | => | Open Wine configurator                          |
+| regedit       | => | Open Wine register editor                       |
+| taskmgr       | => | Open a task manager for wine apps               |
+| uninstaller   | => | Open the 'Wine Uninstaller'                     |
 
 * [winetricks](https://wiki.winehq.org/Winetricks)
 * [winecfg](https://wiki.winehq.org/Winecfg)

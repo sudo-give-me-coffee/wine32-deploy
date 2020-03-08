@@ -1,0 +1,4 @@
+# Change directory to app folder before run
+
+WINE_EXECUTABLE_DIRECTORY=$(dirname "${WINE_EXECUTABLE}" | cut -c4-)
+cd "${WINEPREFIX}/drive_c/${WINE_EXECUTABLE_DIRECTORY}"
