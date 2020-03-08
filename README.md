@@ -12,24 +12,18 @@ distributions.</p>
 # Usage:
 The **wine32-deploy** Commands
 
-> Note: All commands must receive a bottle name
-
+### Bottle usage commands:
 
 | Command         |    | What its does                                   |
 |-----------------|----|-------------------------------------------------|
 | create-bottle   | => | Create a new bottle with default settings       |
 | install         | => | Install a software from outside bottle          |
-| run             | => | Run a software already on the bottle            |
-| --strip         | => | Remove unnecessary resources                    |
-| package         | => | Package the bottle as AppImage                  |
-
-Usage per command:
+| run             | => | Run the bottle as AppImage                      |
 
 * create-bottle:
 ```
 create-bottle  "Bottle Name"
 ```
-The "Bottle Name" is also "App Name"
 
 * install:
 ```
@@ -37,34 +31,46 @@ install  "Bottle Name" "path/to/file.exe"
 ```
 The "path/to/file.exe" is relative to the current directory, and does not need to be inside  "bottle"
 
-* --strip:
-```
---strip  "Bottle Name" resource
-```
-"resource" can be any of these things:
-
-```
- 
-  mesa3D   -->  Support for DirectX 8 apps
-  windows  -->  Wine hardcoded libs (not recommended in most cases)
-  gecko    -->  Trident open source replacement (needed by applications that displays HTML content)
-  mono     -->  Open source replacement for .NET Framework (with Windows Forms)
-  
-```
-
 * run:
 ```
-run  "Bottle Name" "C:\path\to\file.exe"
+run  "Bottle Name"
 ```
-The "C:/path/to/file.exe" must be absolute and you don't need worry about slashes be "\\" or "/" but make sure that starts with "C:" and file exists on "Bottle Name/prefix/drive_c/"
+You must set a "main executable" first
 
-* package:
-```
-package  "Bottle Name" "C:\path\to\file.exe" "Category" "path/to/icon.png"
-```
-The "C:/path/to/file.exe" is the main executable of your program and must be absolute and you don't need worry about slashes be "\" or "/" but make sure that starts with "C:" and file exists on "Bottle Name/prefix/drive_c/"
+### Bottle modification commands:
 
-"Category" represents basically what your application does, the valid words is:
+| Command               |    | What its does                       |
+|-----------------------|----|-------------------------------------|
+| set-main-executable   | => | Set main executable of bottle       |
+| set-name              | => | Set name for application menu name  |
+| set-icon              | => | Set icon for AppImage               |
+| set-category          | => | Defines where application will appear on menu               |
+
+* set-main-executable:
+```
+set-main-executable "Bottle Name" "C:\path\to\file.exe"
+```
+The "C:/path/to/file.exe" is the main executable of your program, and follow some rules:
+1. Must be absolute
+2. You don't need worry about slashes be "\" or "/" 
+3. Make sure that parameter starts with "C:" and file exists on "Bottle Name/prefix/drive_c/"
+
+* set-name:
+```
+set-name "Bottle Name" "New App Name"
+```
+
+* set-icon:
+```
+set-icon "Bottle Name" "path/to/icon.png"
+```
+"path/to/icon.png" is the icon of your program, the path is relative to current directory, and does not need to be inside  "bottle", but must be in PNG format with a recommended 256x256px resolution
+
+* set-category:
+```
+set-category "Bottle Name" "Category"
+```
+"Category" is the category of your program, in Linux this will determine where your Application will appear on Menu
 
 ```
  
@@ -73,37 +79,81 @@ The "C:/path/to/file.exe" is the main executable of your program and must be abs
     Utility
  
 ```
-At last "path/to/icon.png" is the icon of your program, the path is relative to current directory, and does not need to be inside  "bottle", but mustbe in PNG format with a recommended 256x256px resolution
+
 
 <hr>
 
-The **WineLauncher** Commands
+### Flags control commands:
 
-| Command           |    | What its does                                   |
-|-------------------|----|-------------------------------------------------|
-| -copy-app-files   | => | Defines if app files will extracted of AppImage |
-| -change-directory | => | Changes directory to app folder before run      |
+| Command      |    | What its does          |
+|--------------|----|------------------------|
+| enable       | => | Enable a flag          |
+| disable      | => | Set icon for AppImage  |
+| list-flags   | => | List available flags   |
 
-They receives only "yes" or "no" as value for example:
+Flags modify behavior of packaged apps
 
-* To activate -copy-app-files use:
+* enable:
 ```
-    -copy-app-files yes
-```
-
-* To deactivate -copy-app-files use:
-```
-    -copy-app-files yes
+enable "Bottle Name" copy-app-files
 ```
 
-<hr>
+Enable flag "copy-app-files"
 
-At last, the commands for Wine tools bundled with **wine32-appimage**:
+* disable:
+```
+disable "Bottle Name" copy-app-files
+```
+
+Disable flag "copy-app-files"
+
+* list-flags:
+```
+list-flags
+```
+List supported flags and what they do
+
+### AppDir creation and manipulation commands:
+
+| Command       |    | What its does                           |
+|---------------|----|-----------------------------------------|
+| create-appdir | => | Create an AppDir from bottle            |
+| minimize      | => | Remove uneeded files from bottle        |
+| test          | => | Test a bottle as AppImage               |
+| package       | => | Build a AppImage from the bottle AppDir |
+
+Flags modify behavior of packaged apps
+
+* create-appdir:
+```
+create-appdir "Bottle Name"
+```
+If application does verification of DLL sigatures you must pass `--keep-registry` parameter
+
+* minimize:
+```
+minimize "Bottle Name"
+```
+This command allows the quick removal of unnecessary Wine files for the application to run
+
+* test:
+```
+test "Bottle Name"
+```
+This command allows test application simulating a real user HOME, before packaging AppImage
+
+* package:
+```
+package "Bottle Name"
+```
+Simplified way to build an AppImage from the bottle
 
 
-| Command         |    | What its does                                   |
-|-----------------|----|-------------------------------------------------|
-| winetricks    | => | Open Winetricks                                 |
+
+## Useful tools
+
+| Command       |    | What its does                                   |
+|---------------|----|-------------------------------------------------|
 | winecfg       | => | Open Wine configurator                          |
 | regedit       | => | Open Wine register editor                       |
 | taskmgr       | => | Open a task manager for wine apps               |
@@ -120,4 +170,5 @@ At last, the commands for Wine tools bundled with **wine32-appimage**:
 * [Hook and preloader](https://github.com/Hackerl)
 * [Wine](https://www.winehq.org/)
 * [Visual Style](https://www.deviantart.com/lassekongo83/art/Kupo-Finale-for-XP-107950198)
+* [Minimize](https://github.com/sudo-give-me-coffee/win32-appimage/issues/5#issuecomment-576017985)
 
