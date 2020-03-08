@@ -5,7 +5,7 @@ services:
   - docker
 
 script:
-  - chmod +x deploy/build.sh
+  - chmod +x build.sh
   - docker build . -t wine.appimage
   - sudo cp "$(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage')" .
   - sudo chmod 777 Wine-*x86_64.AppImage
