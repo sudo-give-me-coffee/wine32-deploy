@@ -1,10 +1,14 @@
 
 function appdir.create-appdir(){
-  appdir.hasCreated
+
+  [ ! -f "${BOTTLE_NAME}/executable" ] && {
+    help.youMust "set the main executable" "set-main-executable" "\"C:/path/to/your/application.exe\""
+  }
+
   bottle.loadEnvironment
   echo "[ 1/8 ] Creating AppDir..."
   mkdir -p "${BOTTLE_NAME}.AppDir/"
-  WINE_FILES=$(ls "${HERE}" | grep -Ev "${BOTTLE_NAME}|${BOTTLE_NAME}.AppDir|.*.sh$|Resources|Wine.png|wine.desktop|Flags|AppRun")
+  WINE_FILES=$(ls "${HERE}" | grep -Ev "${BOTTLE_NAME}|${BOTTLE_NAME}.AppDir|.*.sh$|Resources|Wine.png|wine.desktop|Flags|AppRun|appimagetool-x86_64.AppImage")
   
   echo "[ 2/8 ] Copying Wine..."
   echo "        This will take a while..."

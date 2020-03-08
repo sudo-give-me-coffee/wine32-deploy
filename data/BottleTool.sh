@@ -61,7 +61,7 @@ function bottle.set-icon(){
     echo "Warning: ${1} does not appear to be a valid PNG image"
   }
   
-  cp "${1}" "${BOTTLE_NAME}.png"
+  cp "${1}" "${BOTTLE_NAME}"/"${BOTTLE_NAME}.png"
   echo "The application icon was changed to '$(basename ${1})'"
 }
 
