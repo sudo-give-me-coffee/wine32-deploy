@@ -14,10 +14,6 @@ export DownloadURLs=(
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/libhookexecv.so"
   "https://github.com/Hackerl/Wine_Appimage/releases/download/v0.9/wine-preloader_hook"
   "https://raw.githubusercontent.com/Winetricks/winetricks/master/src/winetricks"
-  "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationMono.tar.gz"
-  "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationSans.tar.gz"
-  "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/LiberationSerif.tar.gz"
-  "https://dl.bintray.com/sudo-give-me-coffee/wine-appimage/DejaVuSansMono.tar.gz"
   )
 
 # Install build deps
@@ -28,8 +24,9 @@ apt install ${BuildDependencies} -y
 
 # Create Directories
 
-mkdir -p "${WorkingDir}/kupofl"
 mkdir -p "${PackagesDirectory}"
+mkdir -p "${WorkingDir}/Resources"
+mkdir -p "${WorkingDir}/Flags"
 
 # Download files
 
@@ -38,11 +35,7 @@ wget ${wgetOptions} ${DownloadURLs[@]}
 # Turn executable
 
 chmod +x "appimagetool-x86_64.AppImage"
-chmod +x "data/AppRun"
-chmod +x "data/wine"
-chmod +x "data/strip"
-chmod +x "data/WineLauncher"
-chmod +x "wine-preloader_hook"
+chmod +x "data/"*
 chmod +x "winetricks"
 
 # Get WINE deps
@@ -61,19 +54,23 @@ find "${PackagesDirectory}" -name '*deb' ! -name 'libwine*' -exec dpkg -x {} "./
 
 # Copy data to AppDir
 
-cp data/* "${WorkingDir}"
+cp -r data/* "${WorkingDir}"
+cp -r flags/* "${WorkingDir}/Flags"
+cp -r resources/* "${WorkingDir}/Resources"
+
+ls 
+pwd
+ls ..
+
 mv "libhookexecv.so" "${WorkingDir}/bin"
 mv "wine-preloader_hook" "${WorkingDir}/bin"
 mv "winetricks" "${WorkingDir}/bin"
-mv "${WorkingDir}/kupofl.msstyles" "${WorkingDir}/kupofl/"
-mv Liberation*.tar.gz "${WorkingDir}"
-mv DejaVuSans*.tar.gz "${WorkingDir}"
 cp "$(which cabextract)" "${WorkingDir}/bin"
+cp appimagetool-x86_64.AppImage "${WorkingDir}"
 
 # Build AppImage
 
-./appimagetool-x86_64.AppImage --appimage-extract
-./squashfs-root/AppRun "${WorkingDir}"
+./appimagetool-x86_64.AppImage --appimage-extract-and-run "${WorkingDir}"
 mv "Wine-x86_64.AppImage" "Wine-${Version}-x86_64.AppImage"
 
 exit

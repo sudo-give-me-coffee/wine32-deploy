@@ -4,4 +4,4 @@ COPY . /srv/wine
 
 WORKDIR /srv/wine
 
-RUN /srv/wine/deploy/build.sh
+RUN /srv/wine/build.sh
