@@ -148,7 +148,7 @@ function appdir.minimize(){
   find "${BOTTLE_NAME}.AppDir" -type d -empty -delete
   
   type strip &> /dev/null && {
-    [ ! "${1}" = "--no-strip" ] && {
+    [ "${1}" = "--run-strip" ] && {
       find "${BOTTLE_NAME}.AppDir" -not -path '*/prefix/drive_c/*' | sed 's/^/strip --strip-unneeded "/g' | sed 's/$/"/g' | sh &> /dev/null
     }
   }
