@@ -84,9 +84,7 @@ function recipe.run(){
   done
   
   for installer in "${SCRIPT_preparation_install[@]}"; do
-    FILE=$(echo $package | cut -d' ' -f1)
-    DIR=$(echo $package | sed "s|${FILE}||" )
-    recipe.install-from-compressed "${FILE}" "${DIR}"
+    bottle.install "${installer}"
   done
   
   for file in "${SCRIPT_preparation_remove[@]}"; do
