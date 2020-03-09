@@ -9,12 +9,14 @@ function help.main(){
   echo "    Bottle usage commands:"
   echo "      create-bottle       =>  Create a new bottle with default settings"
   echo "      install             =>  Install a software from outside bottle"
+  echo "      remove-file         =>  Removes a file from prefix"
   echo "      run                 =>  Run the main executable of bottle"
   echo
   echo "    Bottle modification commands:"
   echo "      set-main-executable =>  Set main executable of bottle"
   echo "      set-name            =>  Set name for application menu name"
   echo "      set-icon            =>  Set icon for AppImage"
+  echo "      set-category        =>  Defines where application will appear on menu
   echo
   echo "    Flags control commands:"
   echo "      enable              =>  Enable a flag"
