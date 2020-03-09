@@ -16,7 +16,7 @@ function help.main(){
   echo "      set-main-executable =>  Set main executable of bottle"
   echo "      set-name            =>  Set name for application menu name"
   echo "      set-icon            =>  Set icon for AppImage"
-  echo "      set-category        =>  Defines where application will appear on menu
+  echo "      set-category        =>  Defines where application will appear on menu"
   echo
   echo "    Flags control commands:"
   echo "      enable              =>  Enable a flag"
