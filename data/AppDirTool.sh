@@ -36,6 +36,7 @@ function appdir.create-appdir(){
   
   # Fixes https://github.com/sudo-give-me-coffee/win32-appimage/issues/7
   [ "${1}" == "--keep-registry" ] && {
+    shift
     cp ${BOTTLE_NAME}/prefix/system.reg ${BOTTLE_NAME}.AppDir/prefix/
   }
   
@@ -65,11 +66,13 @@ function appdir.create-appdir(){
   echo "" >> ${BOTTLE_NAME}.AppDir/flags.sh
   
   for flag in ${BOTTLE_NAME}.AppDir/*.flag; do 
-    cat "${flag}" >> ${BOTTLE_NAME}.AppDir/flags.sh &> /dev/null
-    rm ${flag} &> /dev/null
+    cat "${flag}" >> ${BOTTLE_NAME}.AppDir/flags.sh 2> /dev/null
+    rm ${flag} &> /dev/null 
   done
   
   echo "[ 8/8 ] All AppDir Creation steps is done"
+  [ "${1}" == "--no-message" ] && return
+  
   echo 
   echo "The nexts steps is:"
   echo 
@@ -146,6 +149,12 @@ function appdir.minimize(){
   echo "${PREFIX_FILES}" | sed "s|^|rm \"${BOTTLE_NAME}.AppDir|g" | sed "s|$|\"|g" | sh
   find "${BOTTLE_NAME}.AppDir" -type l ! -exec test -e {} \; -delete
   find "${BOTTLE_NAME}.AppDir" -type d -empty -delete
+  
+  [ "${1}" = "--append-to-script" ] && {
+    shift
+    echo "${WINE_FILES}"   | sed 's/^/  - /g' >> "${1}"
+    echo "${PREFIX_FILES}" | sed 's/^/  - /g' >> "${1}"
+  }
   
   type strip &> /dev/null && {
     [ "${1}" = "--run-strip" ] && {

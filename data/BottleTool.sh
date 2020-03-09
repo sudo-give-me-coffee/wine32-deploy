@@ -44,9 +44,17 @@ function bottle.install(){
 
 function bottle.set-main-executable(){
   bottle.loadEnvironment
-  bottle.fileExist ${*}
+  bottle.fileExist ${1}
   echo -n ${*} > "${BOTTLE_NAME}"/executable && {
-    echo "File ${*} has defined as main executable"
+    echo "File ${1} has defined as main executable"
+  }
+}
+
+function bottle.remove-file(){
+  bottle.loadEnvironment
+  bottle.fileExist ${1}
+  rm "${FILE_PATH}" && {
+    echo "File '${1}' has been removed"
   }
 }
 
@@ -100,7 +108,7 @@ function bottle.set-category(){
 
 function bottle.fileExist(){
   bottle.loadEnvironment
-  FILE_PATH="${BOTTLE_NAME}"/prefix/drive_c/$(echo ${*} | sed 's|\\|/|g' | cut -c 4-)
+  export FILE_PATH="${BOTTLE_NAME}"/prefix/drive_c/$(echo ${*} | sed 's|\\|/|g' | cut -c 4-)
   [ "${1}" = "" ] && {
     echo "You must pass a file as an argument, as follows:"
     echo 
