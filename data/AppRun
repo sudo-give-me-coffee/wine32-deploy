@@ -4,16 +4,31 @@ export HERE="$(dirname "$(readlink -f "${0}")")"
 
 #---------------------------------------------------------------------------
 
-OPTION="${1}"
-shift
-
-#---------------------------------------------------------------------------
+[ "${APPIMAGE}" = "" ] && export APPIMAGE=${0}
 
 APPIMAGE_DIR=$(dirname "${APPIMAGE}")
-
 [ "${APPIMAGE_DIR}" = "${PWD}" ] && {
   export APPIMAGE="./"$(basename "${APPIMAGE}")
 }
+
+#---------------------------------------------------------------------------
+
+[ " ${@} " = "  " ] && {
+    echo
+    echo "You must ${1} provide at least two parameters"
+    echo "It can be done with:"
+    echo
+    echo "  ${APPIMAGE} [command] [bottle name]"
+    echo
+    echo "Please run ${APPIMAGE} --help for more info"
+    echo
+    exit 1
+}
+
+#---------------------------------------------------------------------------
+
+OPTION="${1}"
+shift
 
 #---------------------------------------------------------------------------
 
@@ -22,6 +37,7 @@ APPIMAGE_DIR=$(dirname "${APPIMAGE}")
 . ${HERE}/FlagsTool.sh
 . ${HERE}/Help.sh
 . ${HERE}/Recipe.sh
+. ${HERE}/ExtraTools.sh
 
 #---------------------------------------------------------------------------
 
@@ -41,6 +57,18 @@ APPIMAGE_DIR=$(dirname "${APPIMAGE}")
   shift
 }
 
+[ "${BOTTLE_NAME}" = "" ] && {
+    echo
+    echo "You must ${1} provide a bottle name"
+    echo "It can be done with:"
+    echo
+    echo "${APPIMAGE} [command] Name_of_Bottle"
+    echo
+    echo "Please run ${APPIMAGE} --help for more info"
+    echo
+    exit 1
+}
+
 #---------------------------------------------------------------------------
 
 type bottle.${OPTION} &> /dev/null && {
@@ -58,6 +86,28 @@ type appdir.${OPTION} &> /dev/null && {
   exit ${?}
 }
 
-help.main
+#---------------------------------------------------------------------------
 
-[ "${OPTION}" = "--help" ] && exit 0 || exit 1
+[ "${OPTION}" == "--winetricks" ] && {
+  extratools.winetricks ${*}
+  exit ${?}
+}
+
+[ -f "${BOTTLE_NAME}/prefix/drive_c/windows/system32/${OPTION}.exe" ] && {
+  extratools.runInside "${BOTTLE_NAME}/prefix/drive_c/windows/system32/${OPTION}.exe"
+  exit ${?}
+}
+
+[ -f "${BOTTLE_NAME}/prefix/drive_c/$(echo ${OPTION} | cut -c 4-)" ] && {
+  extratools.runInside "${OPTION}"
+  exit ${?}
+}
+
+#---------------------------------------------------------------------------
+
+[ "${OPTION}" = "--help" ] && help.main && exit 0
+
+echo "Error: '${OPTION}' is not a valid command"
+echo
+echo "  Please run ${APPIMAGE} --help for more info"
+echo

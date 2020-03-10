@@ -32,6 +32,7 @@ done
   [ -f "${HERE}/prefix/system.reg" ] && {   
     cat "${HERE}/prefix/system.reg" | grep -v ^"\[Software\\Microsoft\\Cryptography" -A 2 \
                                     | grep -v ^"WINE REGISTRY Version 2" >> "${WINEPREFIX}/system.reg"
+                                    
   }
     
   echo '[Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders]'   >> "${WINEPREFIX}/user.reg"
@@ -41,7 +42,6 @@ done
   rm -rf "${WINEPREFIX}/drive_c/users/${USER}/${DESKTOP_DIR}/"
   ln -s "$(xdg-user-dir DESKTOP)" "${WINEPREFIX}/drive_c/users/${USER}/${DESKTOP_DIR}"
   ln -s "${HOME}" "${WINEPREFIX}"/drive_c/users/${USER}/$(basename "$(xdg-user-dir DOCUMENTS)")
-
 }
 
 ${HERE}/wine "$(cat ${HERE}/executable)" ${@}

@@ -50,12 +50,15 @@ function recipe.run(){
   echo "Parsing Recipe..."
   eval $(recipe.parse "${1}")
   
-  DIST_RECIPE=$(basename "${1}" .yml)"_dist.yml"
-  
-  export BOTTLE_NAME="$(echo ${SCRIPT_app}  | sed 's/[[:space:]]//g')"
+  DIST_RECIPE=$(basename "${1}" .yml)"_dist.yml"  
+  export BOTTLE_NAME="$(echo ${SCRIPT_app_full_name}  | sed 's/[[:space:]]//g')"
   
   [ "${BOTTLE_NAME}" = "" ] && {
-    echo "Error: Missing 'app:' key"
+    export BOTTLE_NAME="$(echo ${SCRIPT_app}  | sed 's/[[:space:]]//g')"
+  }
+  
+  [ "${BOTTLE_NAME}" = "" ] && {
+    echo "Error: Missing 'app:' or 'app_full_name:' key"
     exit 1
   }
   [ "$(echo ${SCRIPT_executable}  | sed 's/[[:space:]]//g')" = "" ] && {
@@ -67,9 +70,13 @@ function recipe.run(){
   }
   
   bottle.create-bottle
-  
+   
   for link in "${SCRIPT_ingredients_download[@]}"; do
     recipe.download-file ${link}
+  done
+  
+  for trick in "${SCRIPT_preparation_winetricks[@]}"; do
+    extratools.winetricks "${trick}"
   done
   
   for package_to_install in "${SCRIPT_preparation_install_compressed[@]}"; do
