@@ -33,6 +33,15 @@ done
     cat "${HERE}/prefix/system.reg" | grep -v ^"\[Software\\Microsoft\\Cryptography" -A 2 \
                                     | grep -v ^"WINE REGISTRY Version 2" >> "${WINEPREFIX}/system.reg"
   }
+    
+  echo '[Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders]'   >> "${WINEPREFIX}/user.reg"
+  echo '"Personal"=str(2):"%USERPROFILE%\\'$(basename "$(xdg-user-dir DOCUMENTS)")'"'   >> "${WINEPREFIX}/user.reg"
+  
+  DESKTOP_DIR=$(ls "${WINEPREFIX}"/drive_c/users/${USER}/ | grep -Ev "Application Data|Local Settings")
+  rm -rf "${WINEPREFIX}/drive_c/users/${USER}/${DESKTOP_DIR}/"
+  ln -s "$(xdg-user-dir DESKTOP)" "${WINEPREFIX}/drive_c/users/${USER}/${DESKTOP_DIR}"
+  ln -s "${HOME}" "${WINEPREFIX}"/drive_c/users/${USER}/$(basename "$(xdg-user-dir DOCUMENTS)")
+
 }
 
 ${HERE}/wine "$(cat ${HERE}/executable)" ${@}
