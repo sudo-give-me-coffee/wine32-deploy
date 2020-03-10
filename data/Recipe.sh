@@ -63,8 +63,7 @@ function recipe.run(){
     exit 1
   }
   [ "$(echo ${SCRIPT_category}  | sed 's/[[:space:]]//g')" = "" ] && {
-    echo "Error: Missing 'category:' key"
-    exit 1
+    echo "Warning: Missing 'category:' key, your application will appear on 'Internet' section"
   }
   
   bottle.create-bottle
@@ -92,9 +91,15 @@ function recipe.run(){
   done
   
   bottle.set-name "${SCRIPT_app}"
-  bottle.set-icon "${SCRIPT_icon}"
-  bottle.set-category "${SCRIPT_category}"
   bottle.set-main-executable "${SCRIPT_executable}"
+  
+  [ ! "${SCRIPT_icon}" == "" ] && {
+    bottle.set-icon "${SCRIPT_icon}"
+  }
+  
+  [ ! "${SCRIPT_category}" == "" ] && {
+    bottle.set-category "${SCRIPT_category}"
+  }
   
   for flag in "${SCRIPT_flags[@]}"; do
     flags.enable ${flag}
@@ -118,5 +123,4 @@ function recipe.run(){
   }
   
   appdir.package
-
 }

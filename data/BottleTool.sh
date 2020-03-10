@@ -1,12 +1,13 @@
 
 function bottle.create-bottle(){
+  export WINEARCH=win32
+  export WINEPREFIX=$(readlink -m ${BOTTLE_NAME}/prefix)
+  export HOME=$(readlink -m "${BOTTLE_NAME}")
+  export XDG_CONFIG_HOME="${HOME}/config"
+  
   echo "[ 1/6 ] Creating basic structure..."
   mkdir -p "${BOTTLE_NAME}/"{config,prefix/drive_c/windows}
-  touch "${BOTTLE_NAME}/prefix/drive_c/windows/regedit.exe"
-  
   echo "[ 2/6 ] Creating prefix..."
-  bottle.loadEnvironment
-  rm "${BOTTLE_NAME}/prefix/drive_c/windows/regedit.exe"
   "${HERE}/wineserver"
   WINEDEBUG=-all "${HERE}"/wine regedit "${HERE}"/default.reg
   cp "${HERE}/wine.desktop" "${BOTTLE_NAME}/${BOTTLE_NAME}.desktop"
@@ -47,6 +48,11 @@ function bottle.set-main-executable(){
   bottle.fileExist ${1}
   echo -n ${*} > "${BOTTLE_NAME}"/executable && {
     echo "File ${1} has defined as main executable"
+  }
+  local EXECUTABLE_NAME=$(basename "$(echo ${1} | tr [A-Z] [a-z])" .exe)
+  local ICON_NAME=$(ls ${BOTTLE_NAME}/.local/share/icons/hicolor/256x256/apps | grep -i "${EXECUTABLE_NAME}" | tail -n1)
+  [ ! "${ICON_NAME}" = "" ] && {
+    bottle.set-icon "${BOTTLE_NAME}/.local/share/icons/hicolor/256x256/apps/${ICON_NAME}"
   }
 }
 
