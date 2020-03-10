@@ -13,7 +13,7 @@ APPIMAGE_DIR=$(dirname "${APPIMAGE}")
 
 #---------------------------------------------------------------------------
 
-[ " ${@} " = "  " ] && {
+[ "${#}" = "0" ] && {
     echo
     echo "You must ${1} provide at least two parameters"
     echo "It can be done with:"
