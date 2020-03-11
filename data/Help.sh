@@ -51,7 +51,7 @@ function help.youMust(){
     echo "You must ${1} first!"
     echo "It can be done with:"
     echo
-    echo "${APPIMAGE} ${BOTTLE_NAME} ${2} ${3}"
+    echo "${APPIMAGE} ${2} ${BOTTLE_NAME} ${3}"
     echo
     exit 1
 }

@@ -62,7 +62,7 @@ shift
     echo "You must ${1} provide a bottle name"
     echo "It can be done with:"
     echo
-    echo "${APPIMAGE} [command] Name_of_Bottle"
+    echo "${APPIMAGE} ${OPTION} [bottle name]"
     echo
     echo "Please run ${APPIMAGE} --help for more info"
     echo
