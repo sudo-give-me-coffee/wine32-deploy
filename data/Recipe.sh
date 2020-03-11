@@ -90,7 +90,9 @@ function recipe.run(){
   done
   
   for installer in "${SCRIPT_preparation_install[@]}"; do
-    bottle.install "${installer}"
+    local FILE=$(echo ${installer} | cut -d' ' -f1)
+    local OPTIONS=$(echo ${installer} | sed "s|${FILE} ||" )
+    bottle.install "${FILE}" "${OPTIONS}"
   done
   
   for file in "${SCRIPT_preparation_remove[@]}"; do
