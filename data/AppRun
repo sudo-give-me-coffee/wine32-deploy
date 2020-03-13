@@ -43,6 +43,12 @@ shift
 
 [ "${OPTION}" = "--recipe" ] && {
   [ ! -f "${1}" ] && {
+    wget -q "https://raw.githubusercontent.com/sudo-give-me-coffee/wine_recipes/master/apps%2032%20bit/${1}" -O "${1}" && {
+      recipe.run "${1}"
+      exit ${?}
+    } || {
+      rm -rf "${1}"
+    }
     echo "Error: Recipe file '${1}' not found"
     exit 1
   }
