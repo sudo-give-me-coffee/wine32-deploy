@@ -20,8 +20,14 @@ function recipe.parse(){
 }
 
 function recipe.download-file(){
-  wget -q -c --show-progress --progress=bar:force:noscroll "${1}" || {
-    echo "Error: Can't download file '${1}', wget exited with code ${?}"
+  [ "${1}" = "${2}" ]   && wget -q -c --show-progress --progress=bar:force:noscroll "${1}" && return
+  STATUS=${?}
+
+  [ ! "${1}" = "${2}" ] && wget -q -c --show-progress --progress=bar:force:noscroll "${2}" -O "${1}" && return
+  STATUS=${?}
+  
+  [ ! "${STATUS}" = "0" ] && {
+    echo "Error: Can't download file '${2}', wget exited with code ${STATUS}"
     exit 1
   }
 }
@@ -72,7 +78,10 @@ function recipe.run(){
   bottle.create-bottle
    
   for link in "${SCRIPT_ingredients_download[@]}"; do
-    recipe.download-file ${link}
+    local LINK=$(echo "${link}" | cut -d" "  -f1)
+    local FILE=$(echo "${link}" | sed "s|${LINK} ||" )
+    
+    recipe.download-file "${FILE}" "${LINK}"
   done
   
   for trick in "${SCRIPT_preparation_winetricks[@]}"; do
