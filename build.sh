@@ -40,7 +40,7 @@ chmod +x "winetricks"
 
 # Get WINE deps
 
-aptitude -y -d -o dir::cache::archives="${PackagesDirectory}" install libwine:i386
+aptitude -y -d -o dir::cache::archives="${PackagesDirectory}" install libwine:i386 cups:i386 printer-driver-cups-pdf:i386
 wget -q "http://ftp.us.debian.org/debian/pool/main/libp/libpng/libpng12-0_1.2.50-2+deb8u3_i386.deb" -O "${PackagesDirectory}/libpng12.deb"
 
 # Extract WINE
