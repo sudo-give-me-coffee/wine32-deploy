@@ -1,8 +1,9 @@
 
 function bottle.create-bottle(){
+  mkdir -p "${BOTTLE_NAME}/prefix"
   export WINEARCH=win32
-  export WINEPREFIX=$(readlink -m ${BOTTLE_NAME}/prefix)
-  export HOME=$(readlink -m "${BOTTLE_NAME}")
+  export WINEPREFIX=$(readlink -f ${BOTTLE_NAME}/prefix)
+  export HOME=$(readlink -f "${BOTTLE_NAME}")
   export XDG_CONFIG_HOME="${HOME}/config"
   
   echo "[ 1/6 ] Creating basic structure..."
@@ -146,11 +147,12 @@ function bottle.run(){
 }
 
 function bottle.loadEnvironment(){
+  mkdir -p "${BOTTLE_NAME}/prefix"
   [ ! -f "${BOTTLE_NAME}/prefix/drive_c/windows/regedit.exe" ] && {
     help.youMust "create a bottle" "create-bottle"
   }
   export WINEARCH=win32
-  export WINEPREFIX=$(readlink -m ${BOTTLE_NAME}/prefix)
-  export HOME=$(readlink -m "${BOTTLE_NAME}")
+  export WINEPREFIX=$(readlink -f ${BOTTLE_NAME}/prefix)
+  export HOME=$(readlink -f "${BOTTLE_NAME}")
   export XDG_CONFIG_HOME="${HOME}/config"
 }
