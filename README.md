@@ -165,6 +165,32 @@ Simplified way to build an AppImage from the bottle
 * [taskmgr](https://wiki.winehq.org/Taskmgr)
 * [uninstaller](https://wiki.winehq.org/Uninstaller)
 
+# Building AppImage from source
+All you need is the `docker` and `git`, most linux distributions have it in the repository, once time installed, you need 5 steps:
+
+1. Clone repository and enter on repository (if you don't did it):
+```
+git clone https://github.com/sudo-give-me-coffee/wine32-deploy.git
+cd wine32-deploy
+```
+2. Turn the build script executable:
+```
+chmod +x build.sh
+```
+3. Run docker:
+```
+docker build . -t wine.appimage
+```
+4. Copy AppImage to current dir and remove original file:
+```
+sudo cp "$(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage')" .
+sudo rm "$(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage')" .
+```
+4. Make AppImage executable:
+```
+sudo chmod 777 Wine-*x86_64.AppImage
+```
+
 # Credits:
 * [win32-appimage](LICENSE.md)
 * [Hook and preloader](https://github.com/Hackerl)
