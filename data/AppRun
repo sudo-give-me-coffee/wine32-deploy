@@ -58,6 +58,13 @@ shift
 
 #---------------------------------------------------------------------------
 
+[ "${OPTION}" = "--help" ] && { 
+  help.main
+  exit 0
+}
+
+#---------------------------------------------------------------------------
+
 [ -z "${BOTTLE_NAME}" ] && {
   export BOTTLE_NAME="$(echo ${1} | sed 's/[[:space:]]//g')"
   shift
@@ -110,8 +117,6 @@ type appdir.${OPTION} &> /dev/null && {
 }
 
 #---------------------------------------------------------------------------
-
-[ "${OPTION}" = "--help" ] && help.main && exit 0
 
 echo "Error: '${OPTION}' is not a valid command"
 echo
