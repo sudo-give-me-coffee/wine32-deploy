@@ -2,6 +2,10 @@
 
 HERE="$(dirname "$(readlink -f "${0}")")"
 
+[ "${HOME}" = "" ] && {
+  export HOME=$(mktemp -d)
+}
+
 [ "${XDG_CONFIG_HOME}" = "" ] && {
   export XDG_CONFIG_HOME="${HOME}/.config"
 }
@@ -43,6 +47,12 @@ done
   ln -s "$(xdg-user-dir DESKTOP)" "${WINEPREFIX}/drive_c/users/${USER}/${DESKTOP_DIR}"
   ln -s "${HOME}" "${WINEPREFIX}"/drive_c/users/${USER}/$(basename "$(xdg-user-dir DOCUMENTS)")
 }
+
+echo
+echo HOME=${HOME}
+echo XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+echo WINEPREFIX=${WINEPREFIX}
+echo
 
 ${HERE}/wine "$(cat ${HERE}/executable)" ${@}
 exit ${?}

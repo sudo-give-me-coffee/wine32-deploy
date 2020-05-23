@@ -10,6 +10,18 @@ APPIMAGE_DIR=$(dirname "${APPIMAGE}")
 [ "${APPIMAGE_DIR}" = "${PWD}" ] && {
   export APPIMAGE="./"$(basename "${APPIMAGE}")
 }
+#---------------------------------------------------------------------------
+
+[ "$EUID" = 0 ] && {
+    echo
+    echo "This software must not be run as root"
+    echo "Run it again as a normal user without sudo:"
+    echo
+    echo "  ${APPIMAGE} ${@}"
+    echo
+    exit 1
+}
+
 
 #---------------------------------------------------------------------------
 
