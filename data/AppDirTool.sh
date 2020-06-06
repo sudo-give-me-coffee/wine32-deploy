@@ -96,19 +96,24 @@ function appdir.test(){
   echo "[ 1/3 ] Creating Environment..."
   export HOME=$(mktemp -d)
   export XDG_CONFIG_HOME="${HOME}/config"
+  export XDG_DATA_HOME="${HOME}/data"
+  export LANG=en.UTF-8
   echo
   echo HOME=${HOME}
   echo XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+  echo XDG_DATA_HOME="${XDG_DATA_HOME}"
   echo WINEPREFIX="${XDG_CONFIG_HOME}/${BOTTLE_NAME}"
   echo
   echo "[ 2/3 ] Initializing test..."
   echo
+  mkdir -p "${XDG_DATA_HOME}"
   ${BOTTLE_NAME}.AppDir/AppRun
   echo
   echo "[ 3/3 ] Ending test..."
   echo
   rm -rf ${HOME}
   rm -rf ${XDG_CONFIG_HOME}
+  rm -rf ${XDG_DATA_HOME}
 }
 
 function appdir.minimize(){
@@ -117,10 +122,12 @@ function appdir.minimize(){
   echo "[ 1/8 ] Creating Environment..."
   export HOME=$(mktemp -d)
   export XDG_CONFIG_HOME="${HOME}/config"
+  export XDG_DATA_HOME="${HOME}/data"
   export TMPFS_APPDIR=$(mktemp -d)
   echo
   echo HOME=${HOME}
   echo XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+  echo XDG_DATA_HOME="${XDG_DATA_HOME}"
   echo WINEPREFIX="${XDG_CONFIG_HOME}/${BOTTLE_NAME}"
   echo TMPFS_APPDIR="${TMPFS_APPDIR}"
   echo
@@ -134,6 +141,7 @@ function appdir.minimize(){
   
   echo "[ 4/8 ] Initializing test..."
   echo
+  mkdir -p "${XDG_DATA_HOME}"
   REFERENCE_FILE=$(mktemp)
   ${TMPFS_APPDIR}/AppRun
   echo
@@ -149,6 +157,8 @@ function appdir.minimize(){
   echo "${PREFIX_FILES}" | sed "s|^|rm \"${BOTTLE_NAME}.AppDir|g" | sed "s|$|\"|g" | sh
   find "${BOTTLE_NAME}.AppDir" -type l ! -exec test -e {} \; -delete
   find "${BOTTLE_NAME}.AppDir" -type d -empty -delete
+  
+    export LANG=en.UTF-8
   
   [ "${1}" = "--append-to-script" ] && {
     shift
@@ -170,6 +180,7 @@ function appdir.minimize(){
   rm -rf ${XDG_CONFIG_HOME}
   rm -rf ${TMPFS_APPDIR}
   rm -f  ${REFERENCE_FILE}
+  rm -rf ${XDG_DATA_HOME}
 }
 
 function appdir.package(){
@@ -177,6 +188,7 @@ function appdir.package(){
   [ ! "${1}" = "--package-style" ] && {
      rm -r "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/Resources/Themes/kupofl" 
   }
+  rm "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/system32/winemenubuilder.exe"
   ARCH=x86_64 "${HERE}/appimagetool-x86_64.AppImage" --appimage-extract-and-run --no-appstream "${BOTTLE_NAME}.AppDir"
 }
 

@@ -50,10 +50,10 @@ function bottle.set-main-executable(){
   echo -n ${*} > "${BOTTLE_NAME}"/executable && {
     echo "File ${1} has defined as main executable"
   }
-  local EXECUTABLE_NAME=$(basename "$(echo ${1} | tr [A-Z] [a-z])" .exe)
-  local ICON_NAME=$(ls ${BOTTLE_NAME}/.local/share/icons/hicolor/256x256/apps | grep -i "${EXECUTABLE_NAME}" | tail -n1)
+  local EXECUTABLE_NAME=$(basename "${1}" .exe)
+  local ICON_NAME=$(ls "${BOTTLE_NAME}/data/icons/hicolor/256x256/apps" | grep -i "${EXECUTABLE_NAME}" | tail -n1)
   [ ! "${ICON_NAME}" = "" ] && {
-    bottle.set-icon "${BOTTLE_NAME}/.local/share/icons/hicolor/256x256/apps/${ICON_NAME}"
+    bottle.set-icon "${BOTTLE_NAME}/data/icons/hicolor/256x256/apps/${ICON_NAME}"
   }
 }
 
@@ -155,4 +155,8 @@ function bottle.loadEnvironment(){
   export WINEPREFIX=$(readlink -f ${BOTTLE_NAME}/prefix)
   export HOME=$(readlink -f "${BOTTLE_NAME}")
   export XDG_CONFIG_HOME="${HOME}/config"
+  export XDG_DATA_HOME="${HOME}/data"
+  
+  mkdir -p "${HOME}/data"
+  
 }

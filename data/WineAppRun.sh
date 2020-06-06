@@ -10,8 +10,18 @@ HERE="$(dirname "$(readlink -f "${0}")")"
   export XDG_CONFIG_HOME="${HOME}/.config"
 }
 
+# Make sure that XDG_DATA_HOME is set
+[ "${XDG_DATA_HOME}" = "" ] && {
+  export XDG_DATA_HOME="${HOME}/.local/share"
+  mkdir -p "${XDG_DATA_HOME}"
+}
+
 export WINEARCH=win32
 export WINEPREFIX="${XDG_CONFIG_HOME}/§bottle"
+
+
+# Some Languages uses symbols that breakes Wine
+export LANG=en.UTF-8
 
 mkdir -p "${WINEPREFIX}/drive_c"
 
@@ -51,6 +61,7 @@ done
 echo
 echo HOME=${HOME}
 echo XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
+echo XDG_DATA_HOME=${XDG_DATA_HOME}
 echo WINEPREFIX=${WINEPREFIX}
 echo
 
