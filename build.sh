@@ -20,7 +20,7 @@ export DownloadURLs=(
 
 dpkg --add-architecture i386
 apt update
-apt install ${BuildDependencies} -y
+apt install ${BuildDependencies} zsync -y
 
 # Create Directories
 
@@ -72,5 +72,6 @@ cp appimagetool-x86_64.AppImage "${WorkingDir}"
 
 ./appimagetool-x86_64.AppImage --appimage-extract-and-run "${WorkingDir}"
 mv "Wine-x86_64.AppImage" "Wine-${Version}-x86_64.AppImage"
+zsyncmake "Wine-${Version}-x86_64.AppImage"
 
 exit
