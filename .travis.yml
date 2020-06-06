@@ -7,8 +7,9 @@ services:
 script:
   - chmod +x build.sh
   - docker build . -t wine.appimage
-  - sudo cp "$(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage*')" .
-  - sudo chmod 777 Wine-*x86_64.AppImage
+  - sudo cp "$(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage')" .
+  - sudo cp "$(sudo find /var/lib/docker -name 'Wine-*x86_64.AppImage.zsync')" .
+  - sudo chmod 777 Wine-*x86_64.AppImage*
 
 after_success:
   - mkdir out
