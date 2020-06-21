@@ -1,7 +1,7 @@
 <h1 align="center">
   <img src="data/Wine.png"></img>
   <br />
-  Win32-AppImage | <a href="https://github.com/sudo-give-me-coffee/wine-appimage/releases/tag/continuous">Downloads</a>
+  Win32-AppImage | <a href="https://github.com/sudo-give-me-coffee/wine-appimage/releases/tag/continuous">Downloads</a> | <img src="https://api.travis-ci.org/sudo-give-me-coffee/wine32-deploy.svg?branch=master"></img>
 </h1>
 
 <p align="center"><i>"A simple and lightweight way to distribute the 32-bit Microsoft Windows® application on Linux"</i>.<br> It works on most Linux
