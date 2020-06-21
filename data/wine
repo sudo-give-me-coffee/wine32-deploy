@@ -32,6 +32,11 @@ export WINELDLIBRARY="${HERE}/lib/ld-linux.so.2"
 
 #Wine
 
+[ "${WINEDEBUG}" = "+file" ] && {
+  LD_PRELOAD="${HERE}/bin/libhookexecv.so" strace -e file -o "${HERE}/used_files" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${1}" "${2}" 2>&1 | grep -v ":fixme:"
+  exit $?
+}
+
 LD_PRELOAD="${HERE}/bin/libhookexecv.so" "${WINELDLIBRARY}" "${HERE}/bin/wine" "${1}" "${2}" "${3}" "${4}" "${5}" "${6}" "${7}" "${8}" "${9}" 2>&1 | grep -v ":fixme:"
 exit $?
 

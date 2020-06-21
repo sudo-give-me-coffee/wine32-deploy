@@ -119,11 +119,15 @@ function appdir.test(){
 function appdir.minimize(){
   appdir.hasCreated
   export LANG=en.UTF-8
-  echo "[ 1/8 ] Creating Environment..."
+  
+  export WINEDEBUG=+file
+  
+  echo "[ 1/5 ] Creating Environment..."
   export HOME=$(mktemp -d)
   export XDG_CONFIG_HOME="${HOME}/config"
   export XDG_DATA_HOME="${HOME}/data"
   export TMPFS_APPDIR=$(mktemp -d)
+  export WINEPREFIX="${XDG_CONFIG_HOME}/${BOTTLE_NAME}"
   echo
   echo HOME=${HOME}
   echo XDG_CONFIG_HOME=${XDG_CONFIG_HOME}
@@ -131,51 +135,57 @@ function appdir.minimize(){
   echo WINEPREFIX="${XDG_CONFIG_HOME}/${BOTTLE_NAME}"
   echo TMPFS_APPDIR="${TMPFS_APPDIR}"
   echo
-  
-  echo "[ 2/8 ] Mounting tmpfs..."
-  sudo mount -t tmpfs tmpfs ${TMPFS_APPDIR} -o strictatime,nodiratime 
-  
-  echo "[ 3/8 ] Copying ${BOTTLE_NAME}.AppDir to tmpfs..."
-  echo "        This will take a while..."
-  cp -r ${BOTTLE_NAME}.AppDir/* ${TMPFS_APPDIR}
-  
-  echo "[ 4/8 ] Initializing test..."
-  echo
-  mkdir -p "${XDG_DATA_HOME}"
+
   REFERENCE_FILE=$(mktemp)
-  ${TMPFS_APPDIR}/AppRun
-  echo
   
-  echo "[ 5/8 ] Getting a list unused files..."
-  LIST=$(find ${TMPFS_APPDIR} -mindepth 3 -type f -not -anewer ${REFERENCE_FILE} | sed "s|^${TMPFS_APPDIR}||g")
-  WINE_FILES=$(echo   "${LIST}" | grep -v ^"/prefix/")
-  PREFIX_FILES=$(echo "${LIST}" | grep ^"/prefix/drive_c/windows/")
-  
-  echo "[ 6/8 ] Removing unused files..."
-  echo "        This may take a while..."
-  echo "${WINE_FILES}"   | sed "s|^|rm \"${BOTTLE_NAME}.AppDir|g" | sed "s|$|\"|g" | sh
-  echo "${PREFIX_FILES}" | sed "s|^|rm \"${BOTTLE_NAME}.AppDir|g" | sed "s|$|\"|g" | sh
-  find "${BOTTLE_NAME}.AppDir" -type l ! -exec test -e {} \; -delete
-  find "${BOTTLE_NAME}.AppDir" -type d -empty -delete
-  
-    export LANG=en.UTF-8
-  
-  [ "${1}" = "--append-to-script" ] && {
-    shift
-    echo "${WINE_FILES}"   | sed 's/^/  - /g' >> "${1}"
-    echo "${PREFIX_FILES}" | sed 's/^/  - /g' >> "${1}"
-  }
-  
-  type strip &> /dev/null && {
-    [ "${1}" = "--run-strip" ] && {
-      find "${BOTTLE_NAME}.AppDir" -not -path '*/prefix/drive_c/*' | sed 's/^/strip --strip-unneeded "/g' | sed 's/$/"/g' | sh &> /dev/null
+  echo "[ 2/5 ] Initializing test..."
+  used_files_symlink=($(${BOTTLE_NAME}.AppDir/AppRun | grep -i "c:/windows" \
+                                                     | grep "wine_nt_to_unix_file_name" \
+                                                     | cut -d\" -f4 | sort | uniq))
+                                                     
+  echo "[ 3/5 ] Fetching bottle unused files..."
+  for file in "${used_files_symlink[@]}"; do
+    real_file=$(readlink -f "${file}")
+    [ -f "${real_file}" ] && {
+      touch "${real_file}"
     }
-  }
+  done
+   
+  echo "[ 4/5 ] Removing unused files..."
   
-  echo "[ 7/8 ] Umounting tmpfs..."
-  sudo umount ${TMPFS_APPDIR}
+  cd "${BOTTLE_NAME}.AppDir"
   
-  echo "[ 8/8 ] Ending test..."
+  # Remove unneeded Wine DLLs
+  find ./"prefix/drive_c/windows" -type f -not -anewer ${REFERENCE_FILE} -delete
+  
+  used_files=($(cat used_files | grep -v ENOENT | cut -d\" -f2 | grep "/${BOTTLE_NAME}.AppDir/" | sort | uniq | grep -v "z:"))
+  for file in "${used_files[@]}"; do
+    [ -f "${file}" ] && {
+      # Strace doesn't translate symlinks, so is needed replace the symlink with real file
+      [ -L "${file}" ] && {
+        real_file=$(readlink -f "${file}")
+        [ ! "${file}" = "${real_file}" ] && {
+          rm "${file}"
+          cp "${real_file}" "${file}"
+          rm "${real_file}"
+        }
+      }
+      touch "${file}"
+    }
+  done
+  
+  # libgcc_s.so.1 is required to automatically close Wine after exiting the application
+  touch ./"lib/i386-linux-gnu/libgcc_s.so.1"
+
+  # Remove unused files except under "prefix" to avoid delete application files
+  find . -mindepth 3 -type f -not -path "*/prefix/*" -not -anewer ${REFERENCE_FILE} -delete
+  
+  # Remove empty directories
+  find . -type d -empty -delete
+  # Remove broken symlinks
+  find . -type l ! -exec test -e {} \; -print
+                               
+  echo "[ 5/5 ] Ending test..."
   rm -rf ${HOME}
   rm -rf ${XDG_CONFIG_HOME}
   rm -rf ${TMPFS_APPDIR}
