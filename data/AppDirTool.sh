@@ -183,7 +183,7 @@ function appdir.minimize(){
   # Remove empty directories
   find . -type d -empty -delete
   # Remove broken symlinks
-  find . -type l ! -exec test -e {} \; -print
+  find . -type l ! -exec test -e {} \; -delete
                                
   echo "[ 5/5 ] Ending test..."
   rm -rf ${HOME}
