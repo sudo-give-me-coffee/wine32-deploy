@@ -40,7 +40,13 @@ function bottle.install(){
   echo  
   echo Starting installer "${1}" in ${BOTTLE_NAME}...
   "${HERE}/wineserver"
-  "${HERE}"/wine "${1}" "${2}" 2> /dev/null
+  
+  local installer_type=$(echo "${1}"  | rev | cut -c -3 | tr '[:lower:]' '[:upper:]' | rev)
+  [ "${installer_type}" = "MSI" ] && {
+    "${HERE}"/wine "msiexec" "/i" "${1}" "${2}" 2> /dev/null
+  } || {
+    "${HERE}"/wine "${1}" "${2}" 2> /dev/null
+  }
   echo
 }
 
