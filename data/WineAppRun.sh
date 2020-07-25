@@ -6,6 +6,11 @@ HERE="$(dirname "$(readlink -f "${0}")")"
   export HOME=$(mktemp -d)
 }
 
+# Make sure that USER is set
+[ "${USER}" = "" ] && {
+  export USER=$(basename "${HOME}")
+}
+
 [ "${XDG_CONFIG_HOME}" = "" ] && {
   export XDG_CONFIG_HOME="${HOME}/.config"
 }
@@ -39,6 +44,10 @@ done
   TODAY="$(date '+%Y%m%d')"
   cp "${HERE}/default.reg" "${WINEPREFIX}/"
   sed -i "s/{Install date here}/\"InstallDate\"=\"${TODAY}\"/g" "${WINEPREFIX}/default.reg"
+
+  mkdir -p "${WINEPREFIX}/drive_c/users/${USER}/"
+  ln -s "${WINEPREFIX}/drive_c/users/${USER}/" "${WINEPREFIX}/drive_c/users/999"
+  ln -s "$(xdg-user-dir DESKTOP)" "${WINEPREFIX}/drive_c/users/${USER}/Desktop"
   
   ${HERE}/wine regedit "${WINEPREFIX}/default.reg"
   rm "${WINEPREFIX}/default.reg"
@@ -51,10 +60,7 @@ done
     
   echo '[Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\User Shell Folders]'   >> "${WINEPREFIX}/user.reg"
   echo '"Personal"=str(2):"%USERPROFILE%\\'$(basename "$(xdg-user-dir DOCUMENTS)")'"'   >> "${WINEPREFIX}/user.reg"
-  
-  DESKTOP_DIR=$(ls "${WINEPREFIX}"/drive_c/users/${USER}/ | grep -Ev "Application Data|Local Settings")
-  rm -rf "${WINEPREFIX}/drive_c/users/${USER}/${DESKTOP_DIR}/"
-  ln -s "$(xdg-user-dir DESKTOP)" "${WINEPREFIX}/drive_c/users/${USER}/${DESKTOP_DIR}"
+
   ln -s "${HOME}" "${WINEPREFIX}"/drive_c/users/${USER}/$(basename "$(xdg-user-dir DOCUMENTS)")
 }
 
