@@ -138,6 +138,8 @@ function recipe.run(){
     done
     find "${BOTTLE_NAME}.AppDir" -type l ! -exec test -e {} \; -delete
     find "${BOTTLE_NAME}.AppDir" -type d -empty -delete
+    find "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/Installer" -type f -delete
+    find "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/temp" -type f -delete
   }
   
   appdir.package

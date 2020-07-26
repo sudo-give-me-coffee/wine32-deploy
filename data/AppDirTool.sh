@@ -156,8 +156,11 @@ function appdir.minimize(){
   cd "${BOTTLE_NAME}.AppDir"
   
   # Remove unneeded Wine DLLs
+  [ "${1}" = "--append-to-script" ] && {
+    delete_list_dlls=$(find ./"prefix/drive_c/windows" -type f -not -anewer ${REFERENCE_FILE} -print)
+  }
   find ./"prefix/drive_c/windows" -type f -not -anewer ${REFERENCE_FILE} -delete
-  
+
   used_files=($(cat used_files | grep -v ENOENT | cut -d\" -f2 | grep "/${BOTTLE_NAME}.AppDir/" | sort | uniq | grep -v "z:"))
   for file in "${used_files[@]}"; do
     [ -f "${file}" ] && {
@@ -178,12 +181,23 @@ function appdir.minimize(){
   touch ./"lib/i386-linux-gnu/libgcc_s.so.1"
 
   # Remove unused files except under "prefix" to avoid delete application files
+  [ "${1}" = "--append-to-script" ] && {
+    delete_list_files=$(find . -mindepth 3 -type f -not -path "*/prefix/*" -not -anewer ${REFERENCE_FILE} -print)
+  }
   find . -mindepth 3 -type f -not -path "*/prefix/*" -not -anewer ${REFERENCE_FILE} -delete
   
   # Remove empty directories
   find . -type d -empty -delete
+  
   # Remove broken symlinks
+  [ "${1}" = "--append-to-script" ] && {
+    delete_list_symlinks=$(find . -type l ! -exec test -e {} \; -print)
+  }
   find . -type l ! -exec test -e {} \; -delete
+  
+  # Remove old installers and temporary files
+  find ./"prefix/drive_c/windows/Installer" -type f -delete
+  find ./"prefix/drive_c/windows/temp" -type f -delete
                                
   echo "[ 5/5 ] Ending test..."
   rm -rf ${HOME}
@@ -191,14 +205,25 @@ function appdir.minimize(){
   rm -rf ${TMPFS_APPDIR}
   rm -f  ${REFERENCE_FILE}
   rm -rf ${XDG_DATA_HOME}
+  
+  [ "${1}" = "--append-to-script" ] && {
+    echo 'Finishing "dist" recipe...'
+    unneeded_files=$(echo -e "${delete_list_dlls}\n${delete_list_files}\n${delete_list_symlinks}")
+    cd ..
+    echo "${unneeded_files}" | cut -c 2- | sed 's|^|  - |g' >> "${2}"
+  }
 }
 
 function appdir.package(){
   appdir.hasCreated
   [ ! "${1}" = "--package-style" ] && {
-     rm -r "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/Resources/Themes/kupofl" 
+    [ -f "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/Resources/Themes/kupofl" ] && {
+      rm -r "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/Resources/Themes/kupofl" 
+    }
   }
-  rm "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/system32/winemenubuilder.exe"
+  [ -f "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/system32/winemenubuilder.exe" ] && {
+    rm "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/system32/winemenubuilder.exe"
+  }
   ARCH=x86_64 "${HERE}/appimagetool-x86_64.AppImage" --appimage-extract-and-run --no-appstream "${BOTTLE_NAME}.AppDir"
 }
 
