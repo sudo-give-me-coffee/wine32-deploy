@@ -38,6 +38,17 @@ function recipe.extract(){
   }
 }
 
+function recipe.import(){
+  FILE_PATH=$(readlink -f "${1}")
+  TARGET_DIR="${BOTTLE_NAME}/prefix/drive_c"/$(echo "${2}" | cut -c 4- | sed 's/\\/\//g')
+  CURRENT_DIR=$(pwd)
+  
+  mkdir -p "${TARGET_DIR}"
+  
+  cp -r "${FILE_PATH}" "${TARGET_DIR}" 
+  cd "${CURRENT_DIR}"
+}
+
 function recipe.install-from-compressed(){
   FILE_PATH=$(readlink -f "${1}")
   TARGET_DIR="${BOTTLE_NAME}/prefix/drive_c"/$(echo "${2}" | cut -c 4- | sed 's/\\/\//g')
@@ -104,11 +115,22 @@ function recipe.run(){
     bottle.install "${FILE}" "${OPTIONS}"
   done
   
+  for import_resource in "${SCRIPT_preparation_import[@]}"; do
+    local RESOURCE=$(echo ${import_resource} | cut -d' ' -f1)
+    local DESTINY=$(echo ${import_resource} | sed "s|${RESOURCE} ||" )
+    recipe.import "${RESOURCE}" "${DESTINY}"
+  done
+  
   for file in "${SCRIPT_preparation_remove[@]}"; do
     bottle.remove-file "${file}"
   done
   
-  bottle.set-name "${SCRIPT_app}"
+  [ ! "${SCRIPT_app_full_name}" == "" ] && {
+    bottle.set-name "${SCRIPT_app_full_name}"
+  } || {
+    bottle.set-name "${SCRIPT_app}"
+  }
+  
   bottle.set-main-executable "${SCRIPT_executable}"
   
   [ ! "${SCRIPT_icon}" == "" ] && {
