@@ -79,15 +79,17 @@ function appdir.create-appdir(){
   echo "  Test your AppDir¹"
   echo "   ${APPIMAGE} test ${BOTTLE_NAME}"
   echo
-  echo "  Minimize AppDir to reduce AppImage size²"
+  echo "  Minimize AppDir to reduce AppImage size"
   echo "   ${APPIMAGE} minimize ${BOTTLE_NAME}"
   echo
-  echo "  Package AppDir in to AppImage"
-  echo "   ${APPIMAGE} package path/to/icon.png"
+  echo "  Package AppDir in to AppImage²"
+  echo "   ${APPIMAGE} package ${BOTTLE_NAME}"
   echo 
   echo "Notes: "
-  echo "  ¹ This will create a temporary \${HOME}"
-  echo "  ² You will may be asked for root password, it is needed to mount a tmpfs"
+  echo "  ¹ This will create a temporary \${HOME} and run the application inside"
+  echo "    it simulating a environment that never has ran a Wine application before"
+  echo "  ² You will probably want to check for any missing DLLs, to do it run:"
+  echo "      ${APPIMAGE} search-for-missing-dlls ${BOTTLE_NAME}"
   echo 
 }
 
@@ -232,5 +234,16 @@ function appdir.hasCreated(){
     help.youMust "create a bottle AppDir" "create-appdir"
     exit 1
   }
+}
+
+function appdir.search-for-missing-dlls(){
+  echo "Starting test to fetch missing DLLs..."
+  missing_dlls=($("${BOTTLE_NAME}.AppDir/AppRun" | grep import | cut -d' ' -f3 | sort | uniq))
+  
+  for dll in ${missing_dlls[@]};do
+    echo "Fixing missing DLL dependency ${dll,,}"
+    cp "${HERE}/lib/wine/${dll,,}" "${BOTTLE_NAME}.AppDir/lib/wine/"
+    cp "${HERE}/lib/wine/${dll,,}" "${BOTTLE_NAME}.AppDir/prefix/drive_c/windows/system32"
+  done
 }
 
