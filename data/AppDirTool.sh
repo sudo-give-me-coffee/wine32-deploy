@@ -141,21 +141,27 @@ function appdir.minimize(){
   REFERENCE_FILE=$(mktemp)
   
   echo "[ 2/5 ] Initializing test..."
-  used_files_symlink=($(${BOTTLE_NAME}.AppDir/AppRun | grep -i "c:/windows" \
-                                                     | grep "wine_nt_to_unix_file_name" \
-                                                     | cut -d\" -f4 | sort | uniq))
+  used_files_symlink=($(${BOTTLE_NAME}.AppDir/AppRun | grep "c:/windows" \
+                                                     | cut -d\" -f2 \
+                                                     | sed 's|^\\\\??\\\\C:||g;/windows\/Fonts/d;s|\\\\|/|g' \
+                                                     | sort | uniq ))
                                                      
   echo "[ 3/5 ] Fetching bottle unused files..."
   for file in "${used_files_symlink[@]}"; do
-    real_file=$(readlink -f "${file}")
+    real_file=$(readlink -f "${BOTTLE_NAME}.AppDir/prefix/drive_c${file,,}")
     [ -f "${real_file}" ] && {
       touch "${real_file}"
     }
   done
-   
+
   echo "[ 4/5 ] Removing unused files..."
   
   cd "${BOTTLE_NAME}.AppDir"
+  
+  # Ensures sure that some files are kept
+  touch "prefix/drive_c/windows/system32/ntdll.dll"
+  touch "prefix/drive_c/windows/explorer.exe"
+  touch "prefix/drive_c/windows/notepad.exe"
   
   # Remove unneeded Wine DLLs
   [ "${1}" = "--append-to-script" ] && {
@@ -198,8 +204,13 @@ function appdir.minimize(){
   find . -type l ! -exec test -e {} \; -delete
   
   # Remove old installers and temporary files
-  find ./"prefix/drive_c/windows/Installer" -type f -delete
-  find ./"prefix/drive_c/windows/temp" -type f -delete
+  [ -f ./"prefix/drive_c/windows/Installer" ] && {
+    rm ./"prefix/drive_c/windows/Installer"
+  }
+  
+  [ -f ./"prefix/drive_c/windows/temp" ] && {
+    rm ./"prefix/drive_c/windows/Installer"
+  }
                                
   echo "[ 5/5 ] Ending test..."
   rm -rf ${HOME}
