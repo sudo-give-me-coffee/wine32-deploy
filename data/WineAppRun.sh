@@ -22,7 +22,7 @@ HERE="$(dirname "$(readlink -f "${0}")")"
 }
 
 export WINEARCH=win32
-export WINEPREFIX="${XDG_CONFIG_HOME}/§bottle"
+export WINEPREFIX="${XDG_CONFIG_HOME}/SumatraPDF"
 
 
 # Some Languages uses symbols that breakes Wine
@@ -42,7 +42,7 @@ done
 
 [ ! -f "${WINEPREFIX}/system.reg" ] && {
   TODAY="$(date '+%Y%m%d')"
-  cp "${HERE}/default.reg" "${WINEPREFIX}/"
+  cp "${HERE}/default.reg" --no-clobber "${WINEPREFIX}/"
   sed -i "s/{Install date here}/\"InstallDate\"=\"${TODAY}\"/g" "${WINEPREFIX}/default.reg"
 
   mkdir -p "${WINEPREFIX}/drive_c/users/${USER}/"

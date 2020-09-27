@@ -1,0 +1,4 @@
+
+cp --no-clobber "${HERE}/default.reg" "${WINEPREFIX}/"
+echo '[HKEY_CURRENT_USER\Software\Wine\X11 Driver]' >> "${WINEPREFIX}/default.reg"
+echo '"Decorated"="N"' >> "${WINEPREFIX}/default.reg"
