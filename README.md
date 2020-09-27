@@ -52,7 +52,7 @@ set-main-executable "Bottle Name" "C:\path\to\file.exe"
 ```
 The "C:/path/to/file.exe" is the main executable of your program, and follow some rules:
 1. Must be absolute
-2. You don't need worry about slashes be "\" or "/" 
+2. You don't need worry about slashes be "\\" or "/" 
 3. Make sure that parameter starts with "C:" and file exists on "Bottle Name/prefix/drive_c/"
 
 * set-name:
