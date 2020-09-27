@@ -1,0 +1,5 @@
+
+cp --no-clobber "${HERE}/default.reg" "${WINEPREFIX}/"
+echo '[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ThemeManager]' >> "${WINEPREFIX}/default.reg"
+echo '"ThemeActive"="0"' >> "${WINEPREFIX}/default.reg"
+
