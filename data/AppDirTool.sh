@@ -37,8 +37,8 @@ function appdir.create-appdir(){
   # Fixes https://github.com/sudo-give-me-coffee/win32-appimage/issues/7
   [ "${1}" == "--keep-registry" ] && {
     shift
-    cp ${BOTTLE_NAME}/prefix/system.reg ${BOTTLE_NAME}.AppDir/prefix/
   }
+  cp ${BOTTLE_NAME}/prefix/system.reg ${BOTTLE_NAME}.AppDir/prefix/
   
   rm ${BOTTLE_NAME}.AppDir/prefix/.update-timestamp
   rm -rf ${BOTTLE_NAME}.AppDir/prefix/dosdevices
