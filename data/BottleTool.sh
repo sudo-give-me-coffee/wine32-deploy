@@ -17,6 +17,7 @@ function bottle.create-bottle(){
   sed -i "s|Icon=Wine|Icon=${BOTTLE_NAME}|g" "${BOTTLE_NAME}/${BOTTLE_NAME}.desktop"
   
   echo "[ 3/5 ] Creating a backup of registry..."
+  sleep 3
   cp "${BOTTLE_NAME}/prefix/system.reg" "${BOTTLE_NAME}/system.reg.orig"
   
   echo "[ 4/6 ] Extracting fonts..."  
